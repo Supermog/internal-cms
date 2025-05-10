@@ -16,7 +16,7 @@ function AuthLayout({ children }: AuthLayoutProps) {
         )}
       >
         <PerfectScrollbar className="w-full overflow-visible">
-          <main className="h-max min-h-full flex justify-center items-center sm:px-0 px-10">
+          <main className="h-screen min-h-full flex justify-center items-center sm:px-0 px-10">
             {children}
           </main>
         </PerfectScrollbar>

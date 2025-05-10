@@ -1,3 +1,4 @@
+import { SignInForm } from "@/features/sign-in/components/sign-in.form";
 import { Helmet } from "react-helmet-async";
 
 function SignIn() {
@@ -7,7 +8,9 @@ function SignIn() {
         <title>Sign in</title>
       </Helmet>
 
-      <div className="sm:w-2/3 w-full py-10">asdf</div>
+      <div className="w-full h-full flex justify-center items-center">
+        <SignInForm />
+      </div>
     </>
   );
 }
