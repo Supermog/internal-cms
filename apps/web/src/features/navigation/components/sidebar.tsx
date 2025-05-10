@@ -29,7 +29,7 @@ const renderItem = (item: NavigationItem) => {
       className={({ isActive }) =>
         twMerge(
           "navigation-item group",
-          isActive ? "is-active bg-secondary-light-200 text-primary-800" : ""
+          isActive ? "navigation-item-active" : ""
         )
       }
     >
@@ -56,9 +56,9 @@ function Sidebar(props: SidebarProps) {
   const { navigation, bottomNavigation } = props;
 
   return (
-    <div className="flex grow flex-col gap-y-5 border-r border-gray-200 bg-white pb-4">
+    <div className="flex grow flex-col bg-gray-100 gap-y-5 border-r border-gray-200 pb-4">
       <div
-        className={twMerge("mb-3 mt-8 ml-3 flex h-12 shrink-0 items-center")}
+        className={twMerge("mb-3 mt-8 ml-10 flex h-12 shrink-0 items-center")}
       >
         <Logo />
       </div>

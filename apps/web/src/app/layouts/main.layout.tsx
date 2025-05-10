@@ -14,8 +14,8 @@ function MainLayout({ children }: MainLayoutProps) {
 
   useEffect(() => {
     setNavigation([
+      { name: "Overview", href: "/", icon: Home },
       { name: "Clients", href: "/clients", icon: Building },
-      { name: "Overview", href: "/overview", icon: Home },
     ]);
   }, []);
 

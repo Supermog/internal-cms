@@ -7,11 +7,15 @@ import { GuestGuard } from "@/features/auth/guards/guest-guard";
 import { Dashboard } from "./pages/dashboard";
 import { AuthGuard } from "@/features/auth/guards/auth-guard";
 import { MainLayout } from "./layouts/main.layout";
+import { Clients } from "./pages/clients";
 const router = createBrowserRouter(
   [
     {
       element: <RouteWrapper guard={AuthGuard} layout={MainLayout} />,
-      children: [{ path: routePaths.home, element: <Dashboard /> }],
+      children: [
+        { path: routePaths.home, element: <Dashboard /> },
+        { path: routePaths.clients, element: <Clients /> },
+      ],
     },
     {
       element: <RouteWrapper guard={GuestGuard} layout={AuthLayout} />,

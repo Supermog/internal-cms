@@ -1,0 +1,13 @@
+@layer components {
+  .navigation-item {
+    @apply flex items-center justify-between gap-x-3 rounded-md p-2 text-base font-semibold leading-6 text-gray-600 hover:bg-white hover:text-black;
+  }
+
+  .navigation-icon {
+    @apply h-6 w-6 shrink-0 text-gray-500;
+  }
+
+  .navigation-item-active {
+    @apply bg-white text-black;
+  }
+}
