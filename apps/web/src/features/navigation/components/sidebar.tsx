@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import { Logo } from "@/components/logo";
 import { kebabCase } from "lodash-es";
-// import { LogoutNavigationItem } from '@/components/logout-navigation-item';
+import { LogoutNavigationItem } from "./logout-navigation-item";
 
 const renderItem = (item: NavigationItem) => {
   if (item.disabled) {
@@ -85,7 +85,7 @@ function Sidebar(props: SidebarProps) {
         </ul>
       </nav>
 
-      {/* <LogoutNavigationItem /> */}
+      <LogoutNavigationItem />
     </div>
   );
 }
