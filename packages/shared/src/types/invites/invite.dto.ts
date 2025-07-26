@@ -1,10 +1,14 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
-import { InviteStatus } from '../types/database.types';
+import { IsEmail, IsNotEmpty, IsString, IsOptional } from "class-validator";
+import { InviteStatus } from "../database/database.types";
 
 export class CreateInviteDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 }
 
 export class ValidateInviteDto {

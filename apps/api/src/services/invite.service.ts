@@ -3,10 +3,10 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient, User } from '@supabase/supabase-js';
 import { supabaseClient } from '../config/supabase.config';
-import { Database, Invite } from '../types/database.types';
-import { CreateInviteDto, ValidateInviteDto } from '../dto/invite.dto';
+import { Database, Invite } from '@internal-cms/shared';
+import { CreateInviteDto, ValidateInviteDto } from '@internal-cms/shared';
 import { randomBytes } from 'crypto';
 
 @Injectable()
@@ -21,14 +21,14 @@ export class InviteService {
     createInviteDto: CreateInviteDto,
     createdBy: string,
   ): Promise<Invite> {
-    const { email } = createInviteDto;
+    const { email, name } = createInviteDto;
 
     /**
      * We need to list all users because we can't fetch by email
      */
     const { data: existingUsers } = await this.supabase.auth.admin.listUsers();
     const existingUser = existingUsers.users.find(
-      (user) => user.email === email,
+      (user: User) => user.email === email,
     );
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
@@ -60,6 +60,7 @@ export class InviteService {
       .insert({
         email,
         code,
+        name,
         status: 'pending',
         expires_at: expiresAt.toISOString(),
         created_by: createdBy,

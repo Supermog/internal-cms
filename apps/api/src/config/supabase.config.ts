@@ -1,5 +1,6 @@
+import 'dotenv/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Database } from 'src/types/database.types';
+import { Database } from '@internal-cms/shared';
 
 const createSupabaseClient = (): SupabaseClient<Database> => {
   const supabaseUrl = process.env.SUPABASE_PROJECT_URL;

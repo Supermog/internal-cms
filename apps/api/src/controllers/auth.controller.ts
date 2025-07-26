@@ -8,7 +8,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { AcceptInviteDto } from '../dto/invite.dto';
+import { AcceptInviteDto } from '@internal-cms/shared';
 
 export class SignInDto {
   email!: string;

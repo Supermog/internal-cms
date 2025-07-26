@@ -5,6 +5,7 @@ export interface Database {
         Row: {
           id: string;
           email: string;
+          name: string;
           code: string;
           status: 'pending' | 'accepted' | 'expired';
           expires_at: string;
@@ -16,6 +17,7 @@ export interface Database {
         Insert: {
           id?: string;
           email: string;
+          name: string;
           code: string;
           status?: 'pending' | 'accepted' | 'expired';
           expires_at: string;

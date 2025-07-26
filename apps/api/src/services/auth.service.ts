@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseClient } from '../config/supabase.config';
-import { Database } from '../types/database.types';
-import { AcceptInviteDto } from '../dto/invite.dto';
+import { Database } from '@internal-cms/shared';
+import { AcceptInviteDto } from '@internal-cms/shared';
 import { InviteService } from './invite.service';
 
 @Injectable()

@@ -10,7 +10,7 @@ import { AuthService } from './services/auth.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      envFilePath: ['.env.local', '.env'],
     }),
   ],
   controllers: [AppController, InviteController, AuthController],

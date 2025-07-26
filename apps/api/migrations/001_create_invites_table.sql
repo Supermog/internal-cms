@@ -2,6 +2,7 @@
 CREATE TABLE public.invites (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     code VARCHAR(32) NOT NULL UNIQUE,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'expired')),
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
