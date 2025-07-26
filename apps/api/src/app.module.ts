@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { InviteController } from './controllers/invite.controller';
+import { AuthController } from './controllers/auth.controller';
+import { InviteService } from './services/invite.service';
+import { AuthService } from './services/auth.service';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../..', 'client', 'dist'),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, InviteController, AuthController],
+  providers: [AppService, InviteService, AuthService],
 })
 export class AppModule {}
