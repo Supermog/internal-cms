@@ -2,9 +2,17 @@
   "name": "internal-cms",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.2.4",
   "workspaces": [
     "packages/*",
-    "apps/*",
-    "services/*"
-  ]
+    "apps/*"
+  ],
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "node apps/api/dist/main"
+  }
 }

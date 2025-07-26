@@ -6,7 +6,16 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    port: 8080,
+    host: "localhost",
+    strictPort: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
   optimizeDeps: {
     force: true,
