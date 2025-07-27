@@ -3,6 +3,8 @@ import { REQUEST } from '@nestjs/core';
 import {
   CreateInviteDto,
   ValidateInviteDto,
+  ValidateInviteResponseDto,
+  DeleteInviteResponseDto,
   Invite,
 } from '@internal-cms/shared';
 import { InviteService } from '../services/invite.service';
@@ -33,7 +35,7 @@ export class InviteController {
   @Post('validate')
   async validateInvite(
     @Body() validateInviteDto: ValidateInviteDto,
-  ): Promise<{ valid: boolean; message: string }> {
+  ): Promise<ValidateInviteResponseDto> {
     try {
       await this.inviteService.validateInvite(validateInviteDto);
       return { valid: true, message: 'Invite is valid' };
@@ -45,7 +47,7 @@ export class InviteController {
   @Delete(':id')
   async deleteInvite(
     @Param('id') inviteId: string,
-  ): Promise<{ message: string }> {
+  ): Promise<DeleteInviteResponseDto> {
     await this.inviteService.deleteInvite(inviteId);
     return { message: 'Invite deleted successfully' };
   }

@@ -64,3 +64,31 @@ export enum InviteStatus {
 
 // Use the database table type directly
 export type Invite = Database["public"]["Tables"]["invites"]["Row"];
+
+// Invite-specific response types
+export interface CreateInviteResponseDto {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  client_uid: string | null;
+  code: string;
+  status: string;
+  expires_at: string;
+  created_at: string;
+  created_by: string;
+  accepted_at: string | null;
+}
+
+export interface ValidateInviteResponseDto {
+  valid: boolean;
+  message: string;
+}
+
+export interface DeleteInviteResponseDto {
+  message: string;
+}
+
+export interface GetInvitesByCreatorResponseDto {
+  invites: Invite[];
+}

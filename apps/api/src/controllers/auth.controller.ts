@@ -1,29 +1,35 @@
-import { Controller, Post, Get, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { AcceptInviteDto, SignInDto } from '@internal-cms/shared';
+import {
+  AcceptInviteDto,
+  SignInDto,
+  SignUpResponseDto,
+  AuthenticatedUserResponseDto,
+} from '@internal-cms/shared';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signUpWithInvite(@Body() acceptInviteDto: AcceptInviteDto) {
+  async signUpWithInvite(
+    @Body() acceptInviteDto: AcceptInviteDto,
+  ): Promise<SignUpResponseDto> {
     return this.authService.signUpWithInvite(acceptInviteDto);
   }
 
   @Post('signin')
-  async signIn(@Body() signInDto: SignInDto) {
+  async signIn(
+    @Body() signInDto: SignInDto,
+  ): Promise<AuthenticatedUserResponseDto> {
     const { email, password } = signInDto;
     return this.authService.signIn(email, password);
   }
 
-  @Get('user/:id')
-  async getUser(@Param('id') userId: string) {
+  @Get('user')
+  async getUser(
+    @Param('id') userId: string,
+  ): Promise<AuthenticatedUserResponseDto> {
     return this.authService.getUser(userId);
-  }
-
-  @Delete('user/:id')
-  async deleteUser(@Param('id') userId: string) {
-    return this.authService.deleteUser(userId);
   }
 }

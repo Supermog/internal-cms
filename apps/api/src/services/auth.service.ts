@@ -6,8 +6,12 @@ import {
 } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseClient } from '../config/supabase.config';
-import { Database } from '@internal-cms/shared';
-import { AcceptInviteDto } from '@internal-cms/shared';
+import {
+  Database,
+  AcceptInviteDto,
+  SignUpResponseDto,
+  AuthenticatedUserResponseDto,
+} from '@internal-cms/shared';
 import { InviteService } from './invite.service';
 
 @Injectable()
@@ -18,7 +22,9 @@ export class AuthService {
     this.supabase = supabaseClient;
   }
 
-  async signUpWithInvite(acceptInviteDto: AcceptInviteDto) {
+  async signUpWithInvite(
+    acceptInviteDto: AcceptInviteDto,
+  ): Promise<SignUpResponseDto> {
     const { code, email, password, name } = acceptInviteDto;
 
     // First validate the invite
@@ -58,15 +64,14 @@ export class AuthService {
     });
 
     return {
-      user: {
-        id: authData.user.id,
-        email: authData.user.email,
-      },
       message: 'Account created successfully',
     };
   }
 
-  async signIn(email: string, password: string) {
+  async signIn(
+    email: string,
+    password: string,
+  ): Promise<AuthenticatedUserResponseDto> {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
@@ -89,13 +94,12 @@ export class AuthService {
     }
 
     return {
-      authUser: data.user,
-      databaseUser,
-      session: data.session,
+      auth_user: data.user,
+      database_user: databaseUser,
     };
   }
 
-  async getUser(userId: string) {
+  async getUser(userId: string): Promise<AuthenticatedUserResponseDto> {
     const { data: user, error } =
       await this.supabase.auth.admin.getUserById(userId);
 
@@ -103,22 +107,21 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    return {
-      id: user.user.id,
-      email: user.user.email,
-      firstName: user.user.user_metadata?.first_name,
-      lastName: user.user.user_metadata?.last_name,
-      createdAt: user.user.created_at,
-    };
-  }
+    const { data: databaseUser, error: databaseUserError } = await this.supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.user.id)
+      .single();
 
-  async deleteUser(userId: string) {
-    const { error } = await this.supabase.auth.admin.deleteUser(userId);
-
-    if (error) {
-      throw new BadRequestException(`Failed to delete user: ${error.message}`);
+    if (databaseUserError) {
+      throw new BadRequestException(
+        `Failed to get user: ${databaseUserError.message}`,
+      );
     }
 
-    return { message: 'User deleted successfully' };
+    return {
+      auth_user: user.user,
+      database_user: databaseUser,
+    };
   }
 }

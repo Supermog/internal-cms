@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsUUID,
 } from "class-validator";
+import { Session, User } from "@supabase/supabase-js";
 
 // Define user types based on common patterns
 // These will be used until the user tables are added to the database schema
@@ -23,35 +24,7 @@ export interface ClientUser {
   created_at: string;
 }
 
-// Insert types for creating users
-export interface AdminUserInsert {
-  id?: string;
-  email: string;
-  name: string;
-}
-
-export interface ClientUserInsert {
-  id?: string;
-  email: string;
-  name: string;
-  client_uid: string;
-}
-
-// Update types for modifying users
-export interface AdminUserUpdate {
-  id?: string;
-  email?: string;
-  name?: string;
-  created_at?: string;
-}
-
-export interface ClientUserUpdate {
-  id?: string;
-  email?: string;
-  name?: string;
-  client_uid?: string;
-  created_at?: string;
-}
+export type DatabaseUser = AdminUser | ClientUser;
 
 // DTOs for creating/updating users
 export class CreateAdminUserDto {
@@ -99,18 +72,16 @@ export class SignInDto {
   password: string;
 }
 
-// Response DTOs
-export interface AdminUserResponseDto {
-  id: string;
-  email: string;
-  name: string;
-  created_at: string;
+// Auth-specific response types
+export interface SignUpResponseDto {
+  message: string;
 }
 
-export interface ClientUserResponseDto {
-  id: string;
-  email: string;
-  name: string;
-  client_uid: string;
-  created_at: string;
+export interface AuthenticatedUserResponseDto {
+  auth_user: User;
+  database_user: DatabaseUser;
+}
+
+export interface DeleteUserResponseDto {
+  message: string;
 }

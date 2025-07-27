@@ -44,7 +44,6 @@ export class InviteService {
       .from('invites')
       .select('*')
       .eq('email', email)
-      .eq('status', InviteStatus.PENDING)
       .single();
 
     if (existingInvite) {
@@ -135,22 +134,6 @@ export class InviteService {
         `Failed to update invite: ${error.message}`,
       );
     }
-  }
-
-  async getInvitesByCreator(createdBy: string): Promise<Invite[]> {
-    const { data: invites, error } = await this.supabase
-      .from('invites')
-      .select('*')
-      .eq('created_by', createdBy)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      throw new BadRequestException(
-        `Failed to fetch invites: ${error.message}`,
-      );
-    }
-
-    return invites || [];
   }
 
   async deleteInvite(inviteId: string): Promise<void> {
