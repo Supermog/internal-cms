@@ -25,9 +25,11 @@
   "dependencies": {
     "class-validator": "^0.14.2",
     "tsup": "^8.5.0",
+    "uuid": "^11.1.0",
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "typescript": "^5.5.3"
   }
 }

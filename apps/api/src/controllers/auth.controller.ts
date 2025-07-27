@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Delete,
-  Body,
-  Param,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Param } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { AcceptInviteDto } from '@internal-cms/shared';
 
@@ -20,14 +12,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signUpWithInvite(
-    @Body(new ValidationPipe()) acceptInviteDto: AcceptInviteDto,
-  ) {
+  async signUpWithInvite(@Body() acceptInviteDto: AcceptInviteDto) {
     return this.authService.signUpWithInvite(acceptInviteDto);
   }
 
   @Post('signin')
-  async signIn(@Body(new ValidationPipe()) signInDto: SignInDto) {
+  async signIn(@Body() signInDto: SignInDto) {
     const { email, password } = signInDto;
     return this.authService.signIn(email, password);
   }

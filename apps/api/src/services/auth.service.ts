@@ -31,10 +31,7 @@ export class AuthService {
         password,
         email_confirm: true, // Auto-confirm email since they're invited
         user_metadata: {
-          first_name: firstName,
-          last_name: lastName,
-          invited_by: invite.created_by,
-          invite_accepted_at: new Date().toISOString(),
+          role: invite.role,
         },
       });
 

@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, IsOptional } from "class-validator";
-import { InviteStatus } from "../database/database.types";
+import { Database } from "../database/database.types";
 
 export class CreateInviteDto {
   @IsEmail()
@@ -9,6 +9,10 @@ export class CreateInviteDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  role: string;
 }
 
 export class ValidateInviteDto {
@@ -43,14 +47,5 @@ export class AcceptInviteDto {
   lastName?: string;
 }
 
-export class InviteResponseDto {
-  id!: string;
-  email!: string;
-  code!: string;
-  status!: InviteStatus;
-  expires_at!: string;
-  created_by!: string;
-  created_at!: string;
-  accepted_at!: string | null;
-  user_id!: string | null;
-}
+// Use the database table type directly
+export type Invite = Database["public"]["Tables"]["invites"]["Row"];

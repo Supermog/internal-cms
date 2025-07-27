@@ -5,9 +5,13 @@ import {
 } from '@nestjs/common';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { supabaseClient } from '../config/supabase.config';
-import { Database, Invite } from '@internal-cms/shared';
-import { CreateInviteDto, ValidateInviteDto } from '@internal-cms/shared';
-import { randomBytes } from 'crypto';
+import {
+  Database,
+  Invite,
+  CreateInviteDto,
+  ValidateInviteDto,
+} from '@internal-cms/shared';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class InviteService {
@@ -21,7 +25,7 @@ export class InviteService {
     createInviteDto: CreateInviteDto,
     createdBy: string,
   ): Promise<Invite> {
-    const { email, name } = createInviteDto;
+    const { email, name, role } = createInviteDto;
 
     /**
      * We need to list all users because we can't fetch by email
@@ -59,11 +63,12 @@ export class InviteService {
       .from('invites')
       .insert({
         email,
-        code,
         name,
+        created_by: createdBy,
+        code,
+        role,
         status: 'pending',
         expires_at: expiresAt.toISOString(),
-        created_by: createdBy,
       })
       .select('*')
       .single();
@@ -147,12 +152,11 @@ export class InviteService {
     return invites || [];
   }
 
-  async deleteInvite(inviteId: string, createdBy: string): Promise<void> {
+  async deleteInvite(inviteId: string): Promise<void> {
     const { error } = await this.supabase
       .from('invites')
       .delete()
-      .eq('id', inviteId)
-      .eq('created_by', createdBy);
+      .eq('id', inviteId);
 
     if (error) {
       throw new BadRequestException(
@@ -162,6 +166,6 @@ export class InviteService {
   }
 
   private generateInviteCode(): string {
-    return randomBytes(16).toString('hex').toUpperCase();
+    return uuidv4();
   }
 }
