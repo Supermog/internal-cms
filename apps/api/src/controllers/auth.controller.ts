@@ -1,11 +1,6 @@
 import { Controller, Post, Get, Delete, Body, Param } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { AcceptInviteDto } from '@internal-cms/shared';
-
-export class SignInDto {
-  email!: string;
-  password!: string;
-}
+import { AcceptInviteDto, SignInDto } from '@internal-cms/shared';
 
 @Controller('auth')
 export class AuthController {

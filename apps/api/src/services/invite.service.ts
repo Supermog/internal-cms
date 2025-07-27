@@ -10,6 +10,7 @@ import {
   Invite,
   CreateInviteDto,
   ValidateInviteDto,
+  InviteStatus,
 } from '@internal-cms/shared';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -25,7 +26,7 @@ export class InviteService {
     createInviteDto: CreateInviteDto,
     createdBy: string,
   ): Promise<Invite> {
-    const { email, name, role } = createInviteDto;
+    const { email, name, role, client_uid } = createInviteDto;
 
     /**
      * We need to list all users because we can't fetch by email
@@ -43,7 +44,7 @@ export class InviteService {
       .from('invites')
       .select('*')
       .eq('email', email)
-      .eq('status', 'pending')
+      .eq('status', InviteStatus.PENDING)
       .single();
 
     if (existingInvite) {
@@ -65,6 +66,7 @@ export class InviteService {
         email,
         name,
         created_by: createdBy,
+        client_uid,
         code,
         role,
         status: 'pending',
@@ -93,7 +95,7 @@ export class InviteService {
       .single();
 
     if (error || !invite) {
-      throw new NotFoundException('Invalid invite code or email');
+      throw new NotFoundException('Invite is invalid');
     }
 
     // Check if invite has expired
@@ -101,31 +103,30 @@ export class InviteService {
       // Mark as expired
       await this.supabase
         .from('invites')
-        .update({ status: 'expired' })
+        .update({ status: InviteStatus.EXPIRED })
         .eq('id', invite.id);
 
       throw new BadRequestException('Invite has expired');
     }
 
     // Check if invite is already accepted
-    if (invite.status === 'accepted') {
+    if (invite.status === InviteStatus.ACCEPTED) {
       throw new BadRequestException('Invite has already been accepted');
     }
 
-    if (invite.status === 'expired') {
+    if (invite.status === InviteStatus.EXPIRED) {
       throw new BadRequestException('Invite has expired');
     }
 
     return invite;
   }
 
-  async markInviteAsAccepted(inviteId: string, userId: string): Promise<void> {
+  async markInviteAsAccepted(inviteId: string): Promise<void> {
     const { error } = await this.supabase
       .from('invites')
       .update({
-        status: 'accepted',
+        status: InviteStatus.ACCEPTED,
         accepted_at: new Date().toISOString(),
-        user_id: userId,
       })
       .eq('id', inviteId);
 

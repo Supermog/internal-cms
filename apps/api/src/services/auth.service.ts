@@ -19,7 +19,7 @@ export class AuthService {
   }
 
   async signUpWithInvite(acceptInviteDto: AcceptInviteDto) {
-    const { code, email, password, firstName, lastName } = acceptInviteDto;
+    const { code, email, password, name } = acceptInviteDto;
 
     // First validate the invite
     const invite = await this.inviteService.validateInvite({ code, email });
@@ -46,14 +46,21 @@ export class AuthService {
     }
 
     // Mark invite as accepted
-    await this.inviteService.markInviteAsAccepted(invite.id, authData.user.id);
+    await this.inviteService.markInviteAsAccepted(invite.id);
+
+    // Create user in database
+    await this.supabase.from('users').insert({
+      id: authData.user.id,
+      email: authData.user.email,
+      role: invite.role,
+      client_uid: invite.client_uid,
+      name,
+    });
 
     return {
       user: {
         id: authData.user.id,
         email: authData.user.email,
-        firstName,
-        lastName,
       },
       message: 'Account created successfully',
     };
@@ -69,13 +76,21 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    const { data: databaseUser, error: databaseUserError } = await this.supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (databaseUserError) {
+      throw new BadRequestException(
+        `Failed to get user: ${databaseUserError.message}`,
+      );
+    }
+
     return {
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-        firstName: data.user.user_metadata?.first_name,
-        lastName: data.user.user_metadata?.last_name,
-      },
+      authUser: data.user,
+      databaseUser,
       session: data.session,
     };
   }

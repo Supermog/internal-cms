@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional } from "class-validator";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsUUID,
+  MinLength,
+} from "class-validator";
 import { Database } from "../database/database.types";
 
 export class CreateInviteDto {
@@ -13,6 +20,11 @@ export class CreateInviteDto {
   @IsString()
   @IsNotEmpty()
   role: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  client_uid?: string;
 }
 
 export class ValidateInviteDto {
@@ -38,13 +50,16 @@ export class AcceptInviteDto {
   @IsNotEmpty()
   password!: string;
 
-  @IsOptional()
   @IsString()
-  firstName?: string;
+  @IsNotEmpty()
+  @MinLength(2)
+  name!: string;
+}
 
-  @IsOptional()
-  @IsString()
-  lastName?: string;
+export enum InviteStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  EXPIRED = "expired",
 }
 
 // Use the database table type directly
