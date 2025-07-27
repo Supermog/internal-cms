@@ -2,7 +2,6 @@ import { Controller, Inject, Post, Delete, Body, Param } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import {
   CreateInviteDto,
-  ValidateInviteDto,
   ValidateInviteResponseDto,
   DeleteInviteResponseDto,
   Invite,
@@ -32,12 +31,12 @@ export class InviteController {
     return invite;
   }
 
-  @Post('validate')
+  @Post('validate/:code')
   async validateInvite(
-    @Body() validateInviteDto: ValidateInviteDto,
+    @Param('code') code: string,
   ): Promise<ValidateInviteResponseDto> {
     try {
-      await this.inviteService.validateInvite(validateInviteDto);
+      await this.inviteService.validateInvite(code);
       return { valid: true, message: 'Invite is valid' };
     } catch (error) {
       return { valid: false, message: error.message };

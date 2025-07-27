@@ -9,7 +9,6 @@ import {
   Database,
   Invite,
   CreateInviteDto,
-  ValidateInviteDto,
   InviteStatus,
 } from '@internal-cms/shared';
 import { v4 as uuidv4 } from 'uuid';
@@ -83,14 +82,11 @@ export class InviteService {
     return invite;
   }
 
-  async validateInvite(validateInviteDto: ValidateInviteDto): Promise<Invite> {
-    const { code, email } = validateInviteDto;
-
+  async validateInvite(code: string): Promise<Invite> {
     const { data: invite, error } = await this.supabase
       .from('invites')
       .select('*')
       .eq('code', code)
-      .eq('email', email)
       .single();
 
     if (error || !invite) {

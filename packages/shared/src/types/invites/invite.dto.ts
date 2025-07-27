@@ -27,16 +27,6 @@ export class CreateInviteDto {
   client_uid?: string;
 }
 
-export class ValidateInviteDto {
-  @IsString()
-  @IsNotEmpty()
-  code!: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email!: string;
-}
-
 export class AcceptInviteDto {
   @IsString()
   @IsNotEmpty()
