@@ -148,4 +148,18 @@ export class InviteService {
   private generateInviteCode(): string {
     return uuidv4();
   }
+
+  async getInviteByCode(code: string): Promise<Invite> {
+    const { data: invite, error } = await this.supabase
+      .from('invites')
+      .select('*')
+      .eq('code', code)
+      .single();
+
+    if (error || !invite) {
+      throw new NotFoundException('Invite not found');
+    }
+
+    return invite;
+  }
 }

@@ -28,7 +28,7 @@ export class AuthService {
     const { code, email, password, name } = acceptInviteDto;
 
     // First validate the invite
-    const invite = await this.inviteService.validateInvite({ code, email });
+    const invite = await this.inviteService.validateInvite(code);
 
     // Create user account with Supabase Auth
     const { data: authData, error: authError } =

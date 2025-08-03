@@ -4,8 +4,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { InviteController } from './controllers/invite.controller';
 import { AuthController } from './controllers/auth.controller';
+import { ClientController } from './controllers/client.controller';
 import { InviteService } from './services/invite.service';
 import { AuthService } from './services/auth.service';
+import { ClientService } from './services/client.service';
 
 @Module({
   imports: [
@@ -13,7 +15,12 @@ import { AuthService } from './services/auth.service';
       envFilePath: ['.env.local', '.env'],
     }),
   ],
-  controllers: [AppController, InviteController, AuthController],
-  providers: [AppService, InviteService, AuthService],
+  controllers: [
+    AppController,
+    InviteController,
+    AuthController,
+    ClientController,
+  ],
+  providers: [AppService, InviteService, AuthService, ClientService],
 })
 export class AppModule {}
