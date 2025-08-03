@@ -1,5 +1,11 @@
-import { Controller, Inject, Post, Delete, Body, Param } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import {
+  Controller,
+  Post,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import {
   CreateInviteDto,
   ValidateInviteResponseDto,
@@ -7,26 +13,24 @@ import {
   Invite,
 } from '@internal-cms/shared';
 import { InviteService } from '../services/invite.service';
-import { Request } from 'express';
+import { AuthGuard } from '../guards/auth.guard';
+import { CurrentUser, User } from '../decorators/user.decorator';
 
 @Controller('invites')
 export class InviteController {
-  constructor(
-    private readonly inviteService: InviteService,
-    @Inject(REQUEST) private readonly request: Request,
-  ) {}
+  constructor(private readonly inviteService: InviteService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   async createInvite(
     @Body() createInviteDto: CreateInviteDto,
+    @CurrentUser() user: User,
   ): Promise<Invite> {
-    // In a real app, you'd extract user ID from JWT token
-    // For now, we'll use a placeholder - you'll need to implement auth middleware
-    const createdBy = 'system';
+    const { client_uid } = user;
 
     const invite = await this.inviteService.createInvite(
       createInviteDto,
-      createdBy,
+      client_uid!,
     );
     return invite;
   }
@@ -44,6 +48,7 @@ export class InviteController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   async deleteInvite(
     @Param('id') inviteId: string,
   ): Promise<DeleteInviteResponseDto> {

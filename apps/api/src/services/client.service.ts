@@ -118,10 +118,19 @@ export class ClientService {
     const validLimit = Math.max(1, Math.min(100, limit)); // Cap at 100 items per page
     const offset = (validPage - 1) * validLimit;
 
-    // Get total count
-    const { count, error: countError } = await this.supabase
+    // Build query with optional client filter
+    const countQuery = this.supabase
       .from('clients')
       .select('*', { count: 'exact', head: true });
+
+    const dataQuery = this.supabase
+      .from('clients')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + validLimit - 1);
+
+    // Get total count
+    const { count, error: countError } = await countQuery;
 
     if (countError) {
       throw new BadRequestException(
@@ -133,11 +142,7 @@ export class ClientService {
     const totalPages = Math.ceil(total / validLimit);
 
     // Get paginated data
-    const { data: clients, error } = await this.supabase
-      .from('clients')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + validLimit - 1);
+    const { data: clients, error } = await dataQuery;
 
     if (error) {
       throw new BadRequestException(
@@ -156,12 +161,19 @@ export class ClientService {
     };
   }
 
-  async getClient(id: string): Promise<ClientResponseDto> {
+  async getClient(
+    id: string,
+    clientUid?: string | null,
+  ): Promise<ClientResponseDto> {
     const { data: client, error } = await this.supabase
       .from('clients')
       .select('*')
       .eq('id', id)
       .single();
+
+    if (clientUid && client?.id !== clientUid) {
+      throw new NotFoundException('Client not found');
+    }
 
     if (error || !client) {
       throw new NotFoundException('Client not found');

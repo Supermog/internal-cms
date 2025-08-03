@@ -7,6 +7,11 @@ import {
 } from "class-validator";
 import { Session, User } from "@supabase/supabase-js";
 
+export enum UserRole {
+  ADMIN = "admin",
+  CLIENT = "client",
+}
+
 // Define user types based on common patterns
 // These will be used until the user tables are added to the database schema
 export interface AdminUser {
@@ -14,6 +19,8 @@ export interface AdminUser {
   email: string;
   name: string;
   created_at: string;
+  client_uid: null;
+  role: UserRole.ADMIN;
 }
 
 export interface ClientUser {
@@ -22,6 +29,7 @@ export interface ClientUser {
   name: string;
   client_uid: string;
   created_at: string;
+  role: UserRole.CLIENT;
 }
 
 export type DatabaseUser = AdminUser | ClientUser;

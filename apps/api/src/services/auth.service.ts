@@ -11,6 +11,7 @@ import {
   AcceptInviteDto,
   SignUpResponseDto,
   AuthenticatedUserResponseDto,
+  DatabaseUser,
 } from '@internal-cms/shared';
 import { InviteService } from './invite.service';
 
@@ -85,7 +86,7 @@ export class AuthService {
       .from('users')
       .select('*')
       .eq('id', data.user.id)
-      .single();
+      .single<DatabaseUser>();
 
     if (databaseUserError) {
       throw new BadRequestException(
@@ -111,7 +112,7 @@ export class AuthService {
       .from('users')
       .select('*')
       .eq('id', user.user.id)
-      .single();
+      .single<DatabaseUser>();
 
     if (databaseUserError) {
       throw new BadRequestException(
