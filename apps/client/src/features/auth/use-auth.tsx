@@ -39,9 +39,11 @@ function useAuth() {
         setAxiosHeader(session?.access_token);
 
         if (session?.user?.id) {
-          const user = await authService.fetchDatabaseUser(session.user.id);
-          setDatabaseUser(user);
-          setStatus(user ? QueryStatus.Success : QueryStatus.Error);
+          const { database_user } = await authService.fetchDatabaseUser(
+            session.user.id
+          );
+          setDatabaseUser(database_user);
+          setStatus(database_user ? QueryStatus.Success : QueryStatus.Error);
         } else {
           // No session, clear user data
           setDatabaseUser(null);

@@ -1,7 +1,20 @@
-import axios, { CancelTokenSource } from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import { HttpError } from "@internal-cms/shared";
+import { AxiosResponse } from "axios";
+import { toast } from "react-hot-toast";
+import supabase from "./supabase";
+
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    disableToast?: boolean;
+    disableErrorToast?: boolean;
+    requestToastId?: string;
+    _retry?: boolean;
+  }
+}
 
 // Create axios instance with default configuration
-export const axiosClient = axios.create({
+const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
   timeout: 100000, // 100 seconds
   headers: {
@@ -9,119 +22,150 @@ export const axiosClient = axios.create({
   },
 });
 
-// Utility function to create authenticated request config
-export const createAuthConfig = (token: string) => ({
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+let toastId = "";
 
-// Utility function to create a cancel token
-export const createCancelToken = (): CancelTokenSource =>
-  axios.CancelToken.source();
+const onRequest = (
+  config: InternalAxiosRequestConfig
+): InternalAxiosRequestConfig => {
+  const transformedConfig = config as InternalAxiosRequestConfig & {
+    _retry: boolean;
+  };
 
-// Retry configuration
-const RETRY_CONFIG = {
-  maxRetries: 2,
-  retryDelay: 1000, // 1 second
-  retryStatusCodes: [408, 429, 500, 502, 503, 504], // Retry on these status codes
+  if (
+    config.method === "patch" ||
+    config.method === "post" ||
+    config.method === "delete"
+  ) {
+    //do not display a new toast on retry, keep loading
+    if (transformedConfig._retry) {
+      toast.loading("Loading...", {
+        id: transformedConfig.requestToastId || toastId,
+      });
+    } else if (!transformedConfig.disableToast) {
+      toastId = toast.loading("Loading...", {
+        id: transformedConfig.requestToastId || toastId,
+      });
+    }
+  }
+  return config;
 };
 
-// Utility function to retry failed requests
-const retryRequest = async (
-  error: any,
-  retryCount: number = 0
-): Promise<any> => {
-  const { config } = error;
-
-  if (retryCount >= RETRY_CONFIG.maxRetries) {
-    throw error;
-  }
-
-  if (!RETRY_CONFIG.retryStatusCodes.includes(error.response?.status)) {
-    throw error;
-  }
-
-  // Wait before retrying
-  await new Promise((resolve) =>
-    setTimeout(resolve, RETRY_CONFIG.retryDelay * (retryCount + 1))
-  );
-
-  console.log(
-    `🔄 Retrying request (${retryCount + 1}/${RETRY_CONFIG.maxRetries}): ${config.url}`
-  );
-
-  try {
-    return await axiosClient(config);
-  } catch (retryError) {
-    return retryRequest(retryError, retryCount + 1);
-  }
+const onRequestError = (error: AxiosError): Promise<AxiosError> => {
+  console.error(`[axios request error]:`, JSON.stringify(error));
+  return Promise.reject(error.response?.data);
 };
 
-// Request interceptor to add auth token
-axiosClient.interceptors.request.use(
-  (config) => {
-    // Log outgoing requests for debugging
-    console.log(
-      `🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`
-    );
+const onResponse = (response: AxiosResponse): AxiosResponse => {
+  const method = response.config.method;
 
-    return config;
-  },
-  (error) => {
-    console.error("❌ Request interceptor error:", error);
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor for error handling
-axiosClient.interceptors.response.use(
-  (response) => {
-    // Log successful responses for debugging
-    console.log(`✅ API Response: ${response.status} ${response.config.url}`);
+  //don't show message
+  if (response.config.disableToast) {
     return response;
-  },
-  async (error) => {
-    // Don't retry cancelled requests
-    if (axios.isCancel(error)) {
-      console.log("🔄 Request cancelled");
-      return Promise.reject(error);
+  }
+
+  if (method === "patch") {
+    toast.success("The changes have been saved!", {
+      id: response.config.requestToastId || toastId,
+    });
+  } else if (method === "post") {
+    toast.success("The record has been created successfully!", {
+      id: response.config.requestToastId || toastId,
+    });
+  } else if (method === "delete") {
+    toast.success("The item has been deleted!", {
+      id: response.config.requestToastId || toastId,
+    });
+  }
+
+  return response;
+};
+
+const onResponseError = async (
+  error: AxiosError<HttpError>
+): Promise<AxiosError> => {
+  const originalRequest = error.config as InternalAxiosRequestConfig & {
+    _retry: boolean;
+  };
+
+  // If error is canceled, we don't want to throw an error
+  if (error.name === "CanceledError") {
+    return Promise.reject(error.response?.data);
+  }
+
+  if (
+    (error.response?.status === 401 || error.response?.status === 403) &&
+    originalRequest &&
+    !originalRequest?._retry
+  ) {
+    // add a _retry flag to avoid infinite loop
+    originalRequest._retry = true;
+    const session = await supabase.auth.getSession();
+
+    const token = session.data.session?.access_token;
+
+    if (token) {
+      // set header to the failed request
+      originalRequest.headers.setAuthorization(`Bearer ${token.toString()}`);
+
+      //set header to the axiosClient instance
+      axiosClient.defaults.headers.common.Authorization = `Bearer ${token.toString()}`;
+      return axiosClient(originalRequest);
+    }
+  } else if (error.response?.status === 400) {
+    if (error.response.config.disableToast) {
+      return Promise.reject(error.response?.data);
     }
 
-    // Try to retry the request
-    try {
-      return await retryRequest(error);
-    } catch (retryError) {
-      // Type guard to check if it's an axios error
-      if (axios.isAxiosError(retryError)) {
-        // Handle common errors globally
-        if (retryError.response?.status === 401) {
-          // Unauthorized - could redirect to login or clear session
-          console.error("🔒 Unauthorized request");
-        } else if (retryError.response?.status === 403) {
-          // Forbidden
-          console.error("🚫 Access forbidden");
-        } else if (
-          retryError.response?.status &&
-          retryError.response.status >= 500
-        ) {
-          // Server error
-          console.error("💥 Server error occurred");
-        }
-
-        // Log error details for debugging
-        console.error("❌ API Error:", {
-          status: retryError.response?.status,
-          statusText: retryError.response?.statusText,
-          url: retryError.config?.url,
-          data: retryError.response?.data,
+    if (error.response.data.message) {
+      if (Array.isArray(error.response.data.message)) {
+        toast.error(error.response.data.message[0], {
+          id: error.response.config.requestToastId || toastId,
         });
       } else {
-        // Handle non-axios errors
-        console.error("❌ Non-axios error:", retryError);
+        toast.error(error.response.data.message, {
+          id: error.response.config.requestToastId || toastId,
+        });
       }
-
-      return Promise.reject(retryError);
+    } else {
+      toast.error("Sorry, there was an unexpected error.", {
+        id: error.response.config.requestToastId || toastId,
+      });
     }
+  } else if (error.response?.status === 409 || error.response?.status === 404) {
+    if (!originalRequest.disableErrorToast) {
+      const rawErrorMessage = error.response.data.message;
+      const formattedErrorMessage = Array.isArray(rawErrorMessage)
+        ? rawErrorMessage.join(",")
+        : rawErrorMessage;
+
+      toast.error(formattedErrorMessage, {
+        id: error.response.config.requestToastId || toastId,
+      });
+    }
+  } else {
+    if (originalRequest?._retry) {
+      toast.error(
+        "Sorry, you do not have permission to access this resource.",
+        {
+          id: originalRequest.requestToastId || toastId,
+        }
+      );
+
+      return Promise.reject(error.response?.data);
+    }
+
+    toast.error("Sorry, there was an unexpected error.", {
+      id: originalRequest.requestToastId || toastId,
+    });
   }
-);
+
+  if (process.env.NODE_ENV === "development") {
+    console.error(`[axios response error]:`, JSON.stringify(error));
+  }
+  return Promise.reject(error.response?.data);
+};
+
+axiosClient.interceptors.request.use(onRequest, onRequestError);
+axiosClient.interceptors.response.use(onResponse, onResponseError);
+
+export { axiosClient };

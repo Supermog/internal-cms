@@ -1,11 +1,13 @@
 import { axiosClient } from "@/lib/axios";
-import { DatabaseUser } from "@internal-cms/shared";
+import { AuthenticatedUserResponseDto } from "@internal-cms/shared";
 
 // Function to fetch user from database via API
 const fetchDatabaseUser = async (userId: string) => {
-  const response = await axiosClient.get(`/auth/user/${userId}`);
+  const response = await axiosClient.get<AuthenticatedUserResponseDto>(
+    `/auth/user/${userId}`
+  );
 
-  return response.data.database_user as DatabaseUser;
+  return response.data;
 };
 
 export const authService = Object.freeze({ fetchDatabaseUser });
