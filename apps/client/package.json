@@ -10,13 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@internal-cms/shared": "*",
     "@clerk/clerk-react": "^5.12.0",
     "@hookform/resolvers": "^5.0.1",
+    "@internal-cms/shared": "*",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.2.6",
     "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.11.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lodash-es": "^4.17.21",

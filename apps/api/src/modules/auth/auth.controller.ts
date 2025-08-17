@@ -27,7 +27,7 @@ export class AuthController {
     return this.authService.signIn(email, password);
   }
 
-  @Get('user')
+  @Get('user/:id')
   @UseGuards(AuthGuard)
   async getUser(
     @Param('id') userId: string,

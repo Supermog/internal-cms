@@ -1,6 +1,14 @@
 import supabase from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+import {
+  AdminUser,
+  ClientUser,
+  DatabaseUser,
+  UserRole,
+} from "@internal-cms/shared";
+import { axiosClient } from "@/lib/axios";
+import { authService } from "./auth.service";
 
 export enum QueryStatus {
   Idle = "IDLE",
@@ -9,17 +17,38 @@ export enum QueryStatus {
   Error = "ERROR",
 }
 
+async function setAxiosHeader(accessToken?: string) {
+  if (accessToken) {
+    axiosClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+  } else {
+    delete axiosClient.defaults.headers.common.Authorization;
+  }
+}
+
 function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
+  const [databaseUser, setDatabaseUser] = useState<DatabaseUser | null>(null);
   const [status, setStatus] = useState<QueryStatus>(QueryStatus.Idle);
 
   useEffect(() => {
     setStatus(QueryStatus.Loading);
-    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-      setSession(session);
 
-      setStatus(QueryStatus.Success);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_, session) => {
+        setSession(session);
+        setAxiosHeader(session?.access_token);
+
+        if (session?.user?.id) {
+          const user = await authService.fetchDatabaseUser(session.user.id);
+          setDatabaseUser(user);
+          setStatus(user ? QueryStatus.Success : QueryStatus.Error);
+        } else {
+          // No session, clear user data
+          setDatabaseUser(null);
+          setStatus(QueryStatus.Success);
+        }
+      }
+    );
 
     return () => {
       listener.subscription.unsubscribe();
@@ -31,7 +60,28 @@ function useAuth() {
   const isSuccess = status === QueryStatus.Success;
   const isError = status === QueryStatus.Error;
 
-  return { session, status, isIdle, isLoading, isSuccess, isError };
+  // Utility properties
+  const isAuthenticated = !!session?.user;
+
+  const isAdmin = (databaseUser: DatabaseUser): databaseUser is AdminUser =>
+    databaseUser?.role === UserRole.ADMIN;
+
+  const isClientUser = (
+    databaseUser: DatabaseUser
+  ): databaseUser is ClientUser => databaseUser?.role === UserRole.CLIENT;
+
+  return {
+    session,
+    databaseUser,
+    status,
+    isIdle,
+    isLoading,
+    isSuccess,
+    isError,
+    isAuthenticated,
+    isAdmin,
+    isClientUser,
+  };
 }
 
 export { useAuth };
