@@ -9,7 +9,7 @@ import {
   UseGuards,
   ForbiddenException,
 } from '@nestjs/common';
-import { ClientService } from '../services/client.service';
+import { ClientService } from './client.service';
 import {
   CreateClientDto,
   UpdateClientDto,
@@ -17,8 +17,8 @@ import {
   ClientResponseDto,
   PaginatedResponse,
 } from '@internal-cms/shared';
-import { AuthGuard } from '../guards/auth.guard';
-import { CurrentUser, User } from 'src/decorators/user.decorator';
+import { AuthGuard } from '../../guards/auth.guard';
+import { CurrentUser, User } from '../../decorators/user.decorator';
 
 @Controller('clients')
 @UseGuards(AuthGuard) // Protect all client routes

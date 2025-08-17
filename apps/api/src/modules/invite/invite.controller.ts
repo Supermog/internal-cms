@@ -12,9 +12,9 @@ import {
   DeleteInviteResponseDto,
   Invite,
 } from '@internal-cms/shared';
-import { InviteService } from '../services/invite.service';
-import { AuthGuard } from '../guards/auth.guard';
-import { CurrentUser, User } from '../decorators/user.decorator';
+import { InviteService } from './invite.service';
+import { AuthGuard } from '../../guards/auth.guard';
+import { CurrentUser, User } from '../../decorators/user.decorator';
 
 @Controller('invites')
 export class InviteController {

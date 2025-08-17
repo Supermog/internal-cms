@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { supabaseClient } from '../config/supabase.config';
+import { supabaseClient } from '../../config/supabase.config';
 import {
   Database,
   AcceptInviteDto,
@@ -13,7 +13,7 @@ import {
   AuthenticatedUserResponseDto,
   DatabaseUser,
 } from '@internal-cms/shared';
-import { InviteService } from './invite.service';
+import { InviteService } from '../invite/invite.service';
 
 @Injectable()
 export class AuthService {

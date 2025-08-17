@@ -1,12 +1,12 @@
 import { Controller, Post, Get, Body, Param, UseGuards } from '@nestjs/common';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from './auth.service';
 import {
   AcceptInviteDto,
   SignInDto,
   SignUpResponseDto,
   AuthenticatedUserResponseDto,
 } from '@internal-cms/shared';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { AuthGuard } from '../../guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {

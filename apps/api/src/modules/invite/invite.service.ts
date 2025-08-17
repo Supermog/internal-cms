@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SupabaseClient, User } from '@supabase/supabase-js';
-import { supabaseClient } from '../config/supabase.config';
+import { supabaseClient } from '../../config/supabase.config';
 import {
   Database,
   Invite,
