@@ -14,5 +14,10 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "node apps/api/dist/main"
+  },
+  "dependencies": {
+    "@nestjs/passport": "^11.0.5",
+    "jwt-decode": "^4.0.0",
+    "rxjs": "^7.8.1"
   }
 }

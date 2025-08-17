@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Inject } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   AcceptInviteDto,
@@ -6,11 +6,15 @@ import {
   SignUpResponseDto,
   AuthenticatedUserResponseDto,
 } from '@internal-cms/shared';
-import { AuthGuard } from '../../guards/auth.guard';
+import { REQUEST } from '@nestjs/core';
+import { AuthenticatedRequest } from '../../types/authenticated-request.types';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    @Inject(REQUEST) private readonly request: AuthenticatedRequest,
+  ) {}
 
   @Post('signup')
   async signUpWithInvite(
@@ -28,7 +32,6 @@ export class AuthController {
   }
 
   @Get('user/:id')
-  @UseGuards(AuthGuard)
   async getUser(
     @Param('id') userId: string,
   ): Promise<AuthenticatedUserResponseDto> {

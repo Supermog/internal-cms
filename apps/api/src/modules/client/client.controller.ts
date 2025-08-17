@@ -6,8 +6,9 @@ import {
   Param,
   Patch,
   Query,
-  UseGuards,
   ForbiddenException,
+  Inject,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import {
@@ -17,20 +18,24 @@ import {
   ClientResponseDto,
   PaginatedResponse,
 } from '@internal-cms/shared';
-import { AuthGuard } from '../../guards/auth.guard';
-import { CurrentUser, User } from '../../decorators/user.decorator';
+import { REQUEST } from '@nestjs/core';
+import { AuthenticatedRequest } from 'src/types/authenticated-request.types';
+import { supabaseClient } from 'src/config/supabase.config';
 
 @Controller('clients')
-@UseGuards(AuthGuard) // Protect all client routes
 export class ClientController {
-  constructor(private readonly clientService: ClientService) {}
+  constructor(
+    private readonly clientService: ClientService,
+    @Inject(REQUEST) private readonly request: AuthenticatedRequest,
+  ) {}
 
   @Post()
   async createClient(
     @Body() createClientDto: CreateClientDto,
-    @CurrentUser() user: User,
   ): Promise<Client> {
-    if (user.role !== 'admin') {
+    const user = this.request.user;
+
+    if (user.user_metadata.role !== 'admin') {
       throw new ForbiddenException('You are not authorized to create a client');
     }
 
@@ -57,10 +62,19 @@ export class ClientController {
   }
 
   @Get(':id')
-  async getClient(
-    @Param('id') id: string,
-    @CurrentUser() user: User,
-  ): Promise<ClientResponseDto> {
-    return this.clientService.getClient(id, user.client_uid);
+  async getClient(@Param('id') id: string): Promise<ClientResponseDto> {
+    const user = this.request.user;
+
+    const { data: databaseUser } = await supabaseClient
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (!databaseUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    return this.clientService.getClient(id, databaseUser.client_uid);
   }
 }

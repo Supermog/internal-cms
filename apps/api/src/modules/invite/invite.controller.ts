@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Delete, Body, Param, Inject } from '@nestjs/common';
 import {
   CreateInviteDto,
   ValidateInviteResponseDto,
@@ -13,24 +6,25 @@ import {
   Invite,
 } from '@internal-cms/shared';
 import { InviteService } from './invite.service';
-import { AuthGuard } from '../../guards/auth.guard';
-import { CurrentUser, User } from '../../decorators/user.decorator';
+import { REQUEST } from '@nestjs/core';
+import { AuthenticatedRequest } from 'src/types/authenticated-request.types';
 
 @Controller('invites')
 export class InviteController {
-  constructor(private readonly inviteService: InviteService) {}
+  constructor(
+    private readonly inviteService: InviteService,
+    @Inject(REQUEST) private readonly request: AuthenticatedRequest,
+  ) {}
 
   @Post()
-  @UseGuards(AuthGuard)
   async createInvite(
     @Body() createInviteDto: CreateInviteDto,
-    @CurrentUser() user: User,
   ): Promise<Invite> {
-    const { client_uid } = user;
+    const user = this.request.user;
 
     const invite = await this.inviteService.createInvite(
       createInviteDto,
-      client_uid!,
+      user.id,
     );
     return invite;
   }
@@ -48,7 +42,6 @@ export class InviteController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
   async deleteInvite(
     @Param('id') inviteId: string,
   ): Promise<DeleteInviteResponseDto> {

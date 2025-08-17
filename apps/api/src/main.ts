@@ -2,9 +2,16 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { corsConfig } from './config/cors.config';
+import { AuthenticatedUserInterceptor } from './interceptors/authenticated-user.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Enable CORS
+  app.enableCors(corsConfig);
+
+  app.useGlobalInterceptors(new AuthenticatedUserInterceptor());
 
   // Global validation pipe - handles all validation automatically
   app.useGlobalPipes(
