@@ -11,8 +11,6 @@ async function bootstrap() {
   // Enable CORS
   app.enableCors(corsConfig);
 
-  app.useGlobalInterceptors(new AuthenticatedUserInterceptor());
-
   // Global validation pipe - handles all validation automatically
   app.useGlobalPipes(
     new ValidationPipe({
@@ -21,6 +19,8 @@ async function bootstrap() {
       transform: true, // Auto-transform payloads to DTO instances
     }),
   );
+
+  app.useGlobalInterceptors(new AuthenticatedUserInterceptor());
 
   app.setGlobalPrefix('api');
   await app.listen(process.env.PORT ?? 3000);

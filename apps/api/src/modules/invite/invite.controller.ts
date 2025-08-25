@@ -1,4 +1,4 @@
-import { Controller, Post, Delete, Body, Param, Inject } from '@nestjs/common';
+import { Controller, Post, Delete, Body, Param, Inject, UseGuards } from '@nestjs/common';
 import {
   CreateInviteDto,
   ValidateInviteResponseDto,
@@ -8,8 +8,11 @@ import {
 import { InviteService } from './invite.service';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from 'src/types/authenticated-request.types';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('invites')
+@UseGuards(JwtAuthGuard)
 export class InviteController {
   constructor(
     private readonly inviteService: InviteService,
@@ -26,10 +29,12 @@ export class InviteController {
       createInviteDto,
       user.id,
     );
+
     return invite;
   }
 
   @Post('validate/:code')
+  @Public()
   async validateInvite(
     @Param('code') code: string,
   ): Promise<ValidateInviteResponseDto> {

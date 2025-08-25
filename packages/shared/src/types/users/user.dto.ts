@@ -8,8 +8,8 @@ import {
 import { Session, User } from "@supabase/supabase-js";
 
 export enum UserRole {
-  ADMIN = "admin",
-  CLIENT = "client",
+  ADMIN = "ADMIN",
+  CLIENT = "CLIENT",
 }
 
 // Define user types based on common patterns

@@ -35,7 +35,7 @@ export class ClientController {
   ): Promise<Client> {
     const user = this.request.user;
 
-    if (user.user_metadata.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       throw new ForbiddenException('You are not authorized to create a client');
     }
 

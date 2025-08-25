@@ -8,6 +8,7 @@ import {
 } from '@internal-cms/shared';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from '../../types/authenticated-request.types';
+import { Public } from '../../decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -17,6 +18,7 @@ export class AuthController {
   ) {}
 
   @Post('signup')
+  @Public()
   async signUpWithInvite(
     @Body() acceptInviteDto: AcceptInviteDto,
   ): Promise<SignUpResponseDto> {
@@ -24,6 +26,7 @@ export class AuthController {
   }
 
   @Post('signin')
+  @Public()
   async signIn(
     @Body() signInDto: SignInDto,
   ): Promise<AuthenticatedUserResponseDto> {
@@ -32,6 +35,7 @@ export class AuthController {
   }
 
   @Get('user/:id')
+  @Public()
   async getUser(
     @Param('id') userId: string,
   ): Promise<AuthenticatedUserResponseDto> {

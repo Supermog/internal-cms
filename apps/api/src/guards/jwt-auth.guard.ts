@@ -1,21 +1,17 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AuthGuard } from '@nestjs/passport';
-import { User } from '@supabase/supabase-js';
-import { jwtDecode } from 'jwt-decode';
+import { supabaseClient } from '../config/supabase.config';
+
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private reflector: Reflector) {
-    super();
-  }
+export class JwtAuthGuard {
+  constructor(private reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.getAllAndOverride<boolean>('public', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    const isApiKey = this.reflector.getAllAndOverride<boolean>('apikey', [
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -24,37 +20,52 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return true;
     }
 
-    if (isApiKey) {
-      return true;
+    const request = context.switchToHttp().getRequest();
+    const token = request.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      throw new UnauthorizedException('No token provided');
     }
 
-    return super.canActivate(context);
-  }
-}
-@Injectable()
-export class JwtAuthGuardMock extends AuthGuard('jwt') {
-  constructor(private reflector: Reflector) {
-    super();
-  }
+    try {
+      // Verify the token with Supabase
+      const {
+        data: { user },
+        error,
+      } = await supabaseClient.auth.getUser(token);
 
-  canActivate(context: ExecutionContext) {
-    const accessToken = context
-      .switchToHttp()
-      .getRequest()
-      .headers?.authorization?.replace('Bearer ', '');
+      if (error || !user) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
 
-    if (!accessToken) {
-      //TODO: it needs to be false, when tests are fixed to use AdmitServiceModule only
+      // Get the user from our database
+      const { data: dbUser, error: dbError } = await supabaseClient
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (dbError || !dbUser) {
+        throw new UnauthorizedException('User not found in database');
+      }
+
+      // Attach the user to the request
+      request.user = {
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.name,
+        role: dbUser.role || undefined,
+        client_uid: dbUser.client_uid || undefined,
+        created_at: dbUser.created_at,
+      };
+
       return true;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      throw new UnauthorizedException('Authentication failed');
     }
-
-    // Decode the token
-    const payload: User = jwtDecode(accessToken);
-
-    const requestUser: User = { ...payload };
-
-    // Add populated user to request
-    context.switchToHttp().getRequest().user = requestUser;
-    return true;
   }
 }

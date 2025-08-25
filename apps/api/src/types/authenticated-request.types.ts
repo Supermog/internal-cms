@@ -1,6 +1,6 @@
-import { User } from '@supabase/supabase-js';
 import { Request } from 'express';
+import { RequestUser } from '../modules/auth/jwt.strategy';
 
 export interface AuthenticatedRequest extends Request {
-  user: Omit<User, 'email'> & { email: string };
+  user: RequestUser;
 }
