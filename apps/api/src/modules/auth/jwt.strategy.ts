@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { supabaseClient } from '../../config/supabase.config';
@@ -18,41 +17,36 @@ export interface RequestUser {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
+    const secret = configService.get('SUPABASE_JWT_SECRET');
+
+    if (!secret) {
+      throw new Error('SUPABASE_JWT_SECRET is not defined');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'dummy-secret', // We'll override this in validate method
-      passReqToCallback: true,
+      secretOrKey: secret,
+      issuer: configService.get('SUPABASE_PROJECT_URL'),
+      audience: 'authenticated',
+      algorithms: ['HS256'],
+      passReqToCallback: false,
     });
   }
 
-  public async validate(req: Request): Promise<RequestUser> {
+  public async validate(payload: any): Promise<RequestUser> {
     try {
-      // Get the token from the request
-      const token = req.headers.authorization?.replace('Bearer ', '');
+      // Extract user ID from JWT payload
+      const userId = payload.sub;
 
-      if (!token) {
-        throw new UnauthorizedException('No token provided');
-      }
-
-      // Verify the token with Supabase
-      const {
-        data: { user },
-        error,
-      } = await supabaseClient.auth.getUser(token);
-
-      if (error || !user) {
-        throw new UnauthorizedException({
-          statusCode: 401,
-          error: 'Unauthorized',
-          message: 'Invalid or expired token',
-        });
+      if (!userId) {
+        throw new UnauthorizedException('Invalid token payload');
       }
 
       // Get the user from our database
       const { data: dbUser, error: dbError } = await supabaseClient
         .from('users')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
       if (dbError || !dbUser) {
