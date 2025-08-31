@@ -15,7 +15,7 @@ export interface RequestUser {
 }
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly configService: ConfigService) {
     const secret = configService.get('SUPABASE_JWT_SECRET');
 
@@ -26,9 +26,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: secret,
-      issuer: configService.get('SUPABASE_PROJECT_URL'),
-      audience: 'authenticated',
       algorithms: ['HS256'],
+      audience: 'authenticated',
       passReqToCallback: false,
     });
   }
@@ -67,6 +66,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         created_at: dbUser.created_at,
       };
     } catch (error) {
+      console.log('=== JwtStrategy.validate() error ===', error);
       if (error instanceof UnauthorizedException) {
         throw error;
       }
