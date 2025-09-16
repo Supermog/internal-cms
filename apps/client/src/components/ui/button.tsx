@@ -38,14 +38,23 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  isLoading?: boolean;
+  leadingIcon?: React.ReactNode;
+  trailingIcon?: React.ReactNode;
 }
 
-const Button = React.forwardRef<
-  HTMLButtonElement,
-  ButtonProps & { isLoading?: boolean }
->(
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant, size, asChild = false, isLoading = false, ...props },
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      isLoading = false,
+      leadingIcon,
+      trailingIcon,
+      ...props
+    },
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
@@ -55,7 +64,11 @@ const Button = React.forwardRef<
         ref={ref}
         {...props}
         disabled={isLoading || props.disabled}
-      />
+      >
+        {leadingIcon && leadingIcon}
+        {props.children}
+        {trailingIcon && trailingIcon}
+      </Comp>
     );
   }
 );

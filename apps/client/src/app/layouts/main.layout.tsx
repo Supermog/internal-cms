@@ -1,27 +1,23 @@
 import { Sidebar } from "@/features/navigation/components/sidebar";
 import { NavigationItem } from "@/features/navigation/types/navigation";
 import { Building, Home } from "lucide-react";
-import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 type MainLayoutProps = {
   children?: React.ReactNode;
 };
 
+const navigation: NavigationItem[] = [
+  { name: "Overview", href: "/", icon: Home },
+  { name: "Clients", href: "/clients", icon: Building },
+];
+
+const bottomNavigation: NavigationItem[] = [];
+
 function MainLayout({ children }: MainLayoutProps) {
-  const [navigation, setNavigation] = useState<NavigationItem[]>([]);
-  const [bottomNavigation] = useState<NavigationItem[]>([]);
-
-  useEffect(() => {
-    setNavigation([
-      { name: "Overview", href: "/", icon: Home },
-      { name: "Clients", href: "/clients", icon: Building },
-    ]);
-  }, []);
-
   return (
     <>
-      <div className={twMerge("h-full")}>
+      <div className={twMerge("h-screen")}>
         {/* <MobileNavigation
       navigation={navigation}
       bottomNavigation={bottomNavigation}
@@ -39,10 +35,8 @@ function MainLayout({ children }: MainLayoutProps) {
           />
         </div>
 
-        <div className={twMerge("h-full transition-all", "lg:pl-72")}>
-          <main className="mt-14 h-full px-4 py-6 sm:px-6 lg:mt-0 lg:px-8">
-            {children}
-          </main>
+        <div className={twMerge("w-screen transition-all", "lg:pl-72")}>
+          <main className="py-12 px-6 h-full w-full">{children}</main>
         </div>
       </div>
     </>
