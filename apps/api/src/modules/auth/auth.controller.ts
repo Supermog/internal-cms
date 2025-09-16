@@ -25,8 +25,8 @@ export class AuthController {
     return this.authService.signUpWithInvite(acceptInviteDto);
   }
 
-  @Post('signin')
   @Public()
+  @Post('signin')
   async signIn(
     @Body() signInDto: SignInDto,
   ): Promise<AuthenticatedUserResponseDto> {
@@ -34,8 +34,8 @@ export class AuthController {
     return this.authService.signIn(email, password);
   }
 
-  @Get('user/:id')
   @Public()
+  @Get('user/:id')
   async getUser(
     @Param('id') userId: string,
   ): Promise<AuthenticatedUserResponseDto> {

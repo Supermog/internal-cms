@@ -1,4 +1,12 @@
-import { Controller, Post, Delete, Body, Param, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Delete,
+  Body,
+  Param,
+  Inject,
+  ForbiddenException,
+} from '@nestjs/common';
 import {
   CreateInviteDto,
   ValidateInviteResponseDto,
@@ -23,6 +31,15 @@ export class InviteController {
   ): Promise<Invite> {
     const user = this.request.user;
 
+    if (
+      user.role !== 'admin' &&
+      user.client_uid !== createInviteDto.client_uid
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to create an invite',
+      );
+    }
+
     const invite = await this.inviteService.createInvite(
       createInviteDto,
       user.id,
@@ -31,8 +48,8 @@ export class InviteController {
     return invite;
   }
 
-  @Post('validate/:code')
   @Public()
+  @Post('validate/:code')
   async validateInvite(
     @Param('code') code: string,
   ): Promise<ValidateInviteResponseDto> {
