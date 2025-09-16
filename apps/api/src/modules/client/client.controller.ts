@@ -9,6 +9,7 @@ import {
   ForbiddenException,
   Inject,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import {
@@ -47,6 +48,14 @@ export class ClientController {
     @Param('id') id: string,
     @Body() updateClientDto: UpdateClientDto,
   ): Promise<Client> {
+    const user = this.request.user;
+
+    if (user.role !== 'admin' && user.client_uid !== id) {
+      throw new ForbiddenException(
+        'You are not authorized to update this client',
+      );
+    }
+
     return this.clientService.updateClient(id, updateClientDto);
   }
 
@@ -55,6 +64,12 @@ export class ClientController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
   ): Promise<PaginatedResponse<ClientResponseDto>> {
+    const user = this.request.user;
+
+    if (user.role !== 'admin') {
+      throw new NotFoundException();
+    }
+
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
 
@@ -64,6 +79,10 @@ export class ClientController {
   @Get(':id')
   async getClient(@Param('id') id: string): Promise<ClientResponseDto> {
     const user = this.request.user;
+
+    if (user.role !== 'admin' && user.client_uid !== id) {
+      throw new NotFoundException();
+    }
 
     const { data: databaseUser } = await supabaseClient
       .from('users')
