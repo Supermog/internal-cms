@@ -1,7 +1,12 @@
 import supabase from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import { AdminUser, ClientUser, DatabaseUser } from "@internal-cms/shared";
+import {
+  AdminUser,
+  ClientUser,
+  DatabaseUser,
+  UserRole,
+} from "@internal-cms/shared";
 import { axiosClient } from "@/lib/axios";
 import { authService } from "./auth.service";
 
@@ -61,11 +66,11 @@ function useAuth() {
   const isAuthenticated = !!session?.user;
 
   const isAdmin = (databaseUser: DatabaseUser): databaseUser is AdminUser =>
-    databaseUser?.role === "admin";
+    databaseUser?.role === UserRole.ADMIN;
 
   const isClientUser = (
     databaseUser: DatabaseUser
-  ): databaseUser is ClientUser => databaseUser?.role === "client";
+  ): databaseUser is ClientUser => databaseUser?.role === UserRole.CLIENT;
 
   return {
     session,

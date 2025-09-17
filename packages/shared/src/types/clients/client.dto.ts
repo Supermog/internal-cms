@@ -5,8 +5,11 @@ import {
   IsBoolean,
   IsNumber,
   IsEmail,
+  Min,
+  IsInt,
 } from "class-validator";
 import { Database } from "../database/database.types";
+import { Type } from "class-transformer";
 
 // Use the database table types directly
 export type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -99,18 +102,16 @@ export class UpdateClientDto {
   support_renewal_date?: string;
 }
 
-// Response DTO
-export interface ClientResponseDto {
-  id: string;
-  name: string;
-  short_name: string;
-  support_level: string;
-  key_contact_email: string;
-  key_contact_name: string;
-  is_covered_by_support: boolean;
-  is_monthly_checked: boolean | null;
-  is_proactive_support: boolean | null;
-  hours_per_month: number | null;
-  support_renewal_date: string | null;
-  created_at: string;
+export class GetAllClientsQueryDto {
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  @IsOptional()
+  page?: number;
+
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  @IsOptional()
+  limit?: number;
 }

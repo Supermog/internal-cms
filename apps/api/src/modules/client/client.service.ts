@@ -10,7 +10,6 @@ import {
   CreateClientDto,
   UpdateClientDto,
   Client,
-  ClientResponseDto,
   PaginatedResponse,
 } from '@internal-cms/shared';
 
@@ -112,7 +111,7 @@ export class ClientService {
   async getAllClients(
     page: number = 1,
     limit: number = 10,
-  ): Promise<PaginatedResponse<ClientResponseDto>> {
+  ): Promise<PaginatedResponse<Client>> {
     // Ensure minimum values
     const validPage = Math.max(1, page);
     const validLimit = Math.max(1, Math.min(100, limit)); // Cap at 100 items per page
@@ -125,7 +124,7 @@ export class ClientService {
 
     const dataQuery = this.supabase
       .from('clients')
-      .select('*')
+      .select<'*', Client>('*')
       .order('created_at', { ascending: false })
       .range(offset, offset + validLimit - 1);
 
@@ -161,13 +160,10 @@ export class ClientService {
     };
   }
 
-  async getClient(
-    id: string,
-    clientUid?: string | null,
-  ): Promise<ClientResponseDto> {
+  async getClient(id: string, clientUid?: string | null): Promise<Client> {
     const { data: client, error } = await this.supabase
       .from('clients')
-      .select('*')
+      .select<'*', Client>('*')
       .eq('id', id)
       .single();
 

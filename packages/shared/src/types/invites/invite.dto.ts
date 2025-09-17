@@ -5,8 +5,10 @@ import {
   IsOptional,
   IsUUID,
   MinLength,
+  IsEnum,
 } from "class-validator";
 import { Database } from "../database/database.types";
+import { UserRole } from "../users";
 
 export class CreateInviteDto {
   @IsEmail()
@@ -19,7 +21,8 @@ export class CreateInviteDto {
 
   @IsString()
   @IsNotEmpty()
-  role: string;
+  @IsEnum(UserRole)
+  role: UserRole;
 
   @IsOptional()
   @IsString()

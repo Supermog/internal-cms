@@ -16,8 +16,9 @@ import {
   CreateClientDto,
   UpdateClientDto,
   Client,
-  ClientResponseDto,
   PaginatedResponse,
+  GetAllClientsQueryDto,
+  UserRole,
 } from '@internal-cms/shared';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from 'src/types/authenticated-request.types';
@@ -36,7 +37,7 @@ export class ClientController {
   ): Promise<Client> {
     const user = this.request.user;
 
-    if (user.role !== 'admin') {
+    if (user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('You are not authorized to create a client');
     }
 
@@ -50,7 +51,7 @@ export class ClientController {
   ): Promise<Client> {
     const user = this.request.user;
 
-    if (user.role !== 'admin' && user.client_uid !== id) {
+    if (user.role !== UserRole.ADMIN && user.client_uid !== id) {
       throw new ForbiddenException(
         'You are not authorized to update this client',
       );
@@ -61,26 +62,27 @@ export class ClientController {
 
   @Get()
   async getAllClients(
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
-  ): Promise<PaginatedResponse<ClientResponseDto>> {
+    @Query() query: GetAllClientsQueryDto,
+  ): Promise<PaginatedResponse<Client>> {
     const user = this.request.user;
 
-    if (user.role !== 'admin') {
+    if (user.role !== UserRole.ADMIN) {
       throw new NotFoundException();
     }
 
-    const pageNum = parseInt(page, 10) || 1;
-    const limitNum = parseInt(limit, 10) || 10;
+    const { page, limit } = query;
+
+    const pageNum = page || 1;
+    const limitNum = limit || 10;
 
     return this.clientService.getAllClients(pageNum, limitNum);
   }
 
   @Get(':id')
-  async getClient(@Param('id') id: string): Promise<ClientResponseDto> {
+  async getClient(@Param('id') id: string): Promise<Client> {
     const user = this.request.user;
 
-    if (user.role !== 'admin' && user.client_uid !== id) {
+    if (user.role !== UserRole.ADMIN && user.client_uid !== id) {
       throw new NotFoundException();
     }
 

@@ -12,6 +12,7 @@ import {
   ValidateInviteResponseDto,
   DeleteInviteResponseDto,
   Invite,
+  UserRole,
 } from '@internal-cms/shared';
 import { InviteService } from './invite.service';
 import { REQUEST } from '@nestjs/core';
@@ -32,7 +33,7 @@ export class InviteController {
     const user = this.request.user;
 
     if (
-      user.role !== 'admin' &&
+      user.role !== UserRole.ADMIN &&
       user.client_uid !== createInviteDto.client_uid
     ) {
       throw new ForbiddenException(

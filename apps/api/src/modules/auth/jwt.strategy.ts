@@ -3,13 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { supabaseClient } from '../../config/supabase.config';
+import { UserRole } from '@internal-cms/shared';
 
 // Define the user type that will be attached to the request
 export interface RequestUser {
   id: string;
   email: string;
   name?: string;
-  role?: string;
+  role?: UserRole;
   client_uid?: string | null;
   created_at?: string;
 }
@@ -61,7 +62,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         id: dbUser.id,
         email: dbUser.email,
         name: dbUser.name,
-        role: dbUser.role || undefined,
+        role: (dbUser.role as UserRole) || undefined,
         client_uid: dbUser.client_uid || undefined,
         created_at: dbUser.created_at,
       };
