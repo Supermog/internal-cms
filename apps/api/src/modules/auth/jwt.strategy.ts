@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { supabaseClient } from '../../config/supabase.config';
 import { UserRole } from '@internal-cms/shared';
+import * as jwksClient from 'jwks-rsa';
 
 // Define the user type that will be attached to the request
 export interface RequestUser {
@@ -18,19 +19,54 @@ export interface RequestUser {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly configService: ConfigService) {
-    const secret = configService.get('SUPABASE_JWT_SECRET');
+    const supabaseUrl = configService.get('SUPABASE_PROJECT_URL');
 
-    if (!secret) {
-      throw new Error('SUPABASE_JWT_SECRET is not defined');
+    if (!supabaseUrl) {
+      throw new Error('SUPABASE_PROJECT_URL is not defined');
     }
+
+    // Create JWKS client for Supabase
+    const client = jwksClient({
+      jwksUri: `${supabaseUrl}/auth/v1/.well-known/jwks.json`,
+      cache: true,
+      cacheMaxAge: 600000, // 10 minutes
+      rateLimit: true,
+      jwksRequestsPerMinute: 5,
+    });
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: secret,
-      algorithms: ['HS256'],
+      secretOrKeyProvider: (request, rawJwtToken, done) => {
+        const decoded = this.decodeJwt(rawJwtToken);
+        if (!decoded || !decoded.header.kid) {
+          return done(new Error('Unable to decode JWT or missing kid'));
+        }
+
+        client.getSigningKey(decoded.header.kid, (err, key) => {
+          if (err) {
+            return done(err);
+          }
+          const signingKey = key?.getPublicKey();
+          done(null, signingKey);
+        });
+      },
+      algorithms: ['ES256'],
       audience: 'authenticated',
       passReqToCallback: false,
     });
+  }
+
+  private decodeJwt(token: string) {
+    try {
+      const [header, payload] = token.split('.');
+      return {
+        header: JSON.parse(Buffer.from(header, 'base64').toString()),
+        payload: JSON.parse(Buffer.from(payload, 'base64').toString()),
+      };
+    } catch (error) {
+      console.log('=== JwtStrategy.decodeJwt() error ===', error);
+      return null;
+    }
   }
 
   public async validate(payload: any): Promise<RequestUser> {

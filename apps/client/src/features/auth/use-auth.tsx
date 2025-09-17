@@ -1,14 +1,14 @@
 import supabase from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import {
-  AdminUser,
-  ClientUser,
-  DatabaseUser,
-  UserRole,
-} from "@internal-cms/shared";
+import { AdminUser, ClientUser, DatabaseUser } from "@internal-cms/shared";
 import { axiosClient } from "@/lib/axios";
 import { authService } from "./auth.service";
+
+export enum UserRole {
+  ADMIN = "ADMIN",
+  CLIENT = "CLIENT",
+}
 
 export enum QueryStatus {
   Idle = "IDLE",

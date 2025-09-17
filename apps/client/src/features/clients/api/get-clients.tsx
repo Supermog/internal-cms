@@ -10,6 +10,7 @@ import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 export async function getClients(
   data: GetAllClientsQueryDto
 ): Promise<PaginatedResponse<Client>> {
+  console.log(axiosClient.defaults.headers.common.Authorization);
   const response = await axiosClient.get<PaginatedResponse<Client>>(
     "/clients",
     { params: data }

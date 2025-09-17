@@ -1,8 +1,20 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
+import { useGetClients } from "@/features/clients/api/get-clients";
 import { Plus } from "lucide-react";
 
 function Clients() {
+  const {
+    data: clients,
+    // isLoading,
+    // isError,
+  } = useGetClients({
+    page: 1,
+    limit: 10,
+  });
+
+  console.log(clients);
+
   return (
     <div>
       <PageTitle title="Clients" description="Client overview and status" />
