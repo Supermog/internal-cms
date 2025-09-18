@@ -1,6 +1,8 @@
 import { createContext, useContext } from "react";
 import { useAuth } from "./use-auth";
 import { Session } from "@supabase/supabase-js";
+import { LoadingScreen } from "@/components/ui/loading-screen";
+import { ErrorFallback } from "@/components/ui/error-fallback";
 
 type AuthUserContextType = {
   session: Session | null;
@@ -30,12 +32,11 @@ function AuthUserProvider({ children }: AuthUserProviderProps) {
   const { session, isLoading, isError } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (isError) {
-    // TODO: handle error
-    return <div>Error</div>;
+    return <ErrorFallback variant="fullscreen" />;
   }
 
   const contextValue = {
