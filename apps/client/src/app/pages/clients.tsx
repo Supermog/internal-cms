@@ -1,6 +1,5 @@
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
-
 import { Plus } from "lucide-react";
 
 function Clients() {

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { Spinner } from "./spinner";
 
 interface LoadingScreenProps {
   className?: string;
@@ -9,12 +10,6 @@ interface LoadingScreenProps {
 
 const LoadingScreen = React.forwardRef<HTMLDivElement, LoadingScreenProps>(
   ({ className, size = "md", message, ...props }, ref) => {
-    const sizeClasses = {
-      sm: "w-6 h-6",
-      md: "w-8 h-8",
-      lg: "w-12 h-12",
-    };
-
     return (
       <div
         ref={ref}
@@ -26,12 +21,7 @@ const LoadingScreen = React.forwardRef<HTMLDivElement, LoadingScreenProps>(
       >
         <div className="flex flex-col items-center space-y-4">
           {/* Spinner */}
-          <div
-            className={cn(
-              "animate-spin rounded-full border-4 border-gray-200 border-t-brand-400",
-              sizeClasses[size]
-            )}
-          />
+          <Spinner size={size} />
 
           {/* Loading message */}
           {message && (
