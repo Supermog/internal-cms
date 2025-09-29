@@ -8,6 +8,7 @@
     "apps/*"
   ],
   "devDependencies": {
+    "supabase": "^2.40.7",
     "turbo": "^2.5.4"
   },
   "scripts": {

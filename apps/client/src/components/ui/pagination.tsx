@@ -25,10 +25,6 @@ export function Pagination<TData>({
   pageSizeOptions = [10, 20, 30, 40, 50],
   className,
 }: PaginationProps<TData>) {
-  if (!table.getCanNextPage() && !table.getCanPreviousPage()) {
-    return null;
-  }
-
   return (
     <div
       className={`flex items-center justify-between px-2 ${className || ""}`}

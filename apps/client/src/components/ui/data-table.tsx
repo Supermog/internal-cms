@@ -30,7 +30,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading?: boolean;
-  error?: Error | null;
+  isError?: boolean;
   onErrorRetry?: () => void;
   // Pagination
   enablePagination?: boolean;
@@ -59,7 +59,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading = false,
-  error = null,
+  isError = false,
   onErrorRetry,
   enablePagination = true,
   pageSize = 10,
@@ -160,7 +160,7 @@ export function DataTable<TData, TValue>({
   // Determine which state to show
   const getTableState = () => {
     if (isLoading) return "loading";
-    if (error) return "error";
+    if (isError) return "error";
     if (!data || data.length === 0) return "empty";
     return "normal";
   };

@@ -1,0 +1,75 @@
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "@/lib/utils";
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-normal transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface BadgeBaseProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function BadgeBase({ className, variant, ...props }: BadgeBaseProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
+}
+
+export type BadgeType = "orange" | "green" | "red" | "blue";
+
+export interface BadgeProps
+  extends BadgeBaseProps,
+    VariantProps<typeof badgeVariants> {
+  type: BadgeType;
+}
+
+function Badge({ className, variant, type, ...props }: BadgeProps) {
+  let backgroundColor = "";
+  switch (type) {
+    case "green":
+      backgroundColor = "bg-green-500";
+      break;
+    case "red":
+      backgroundColor = "bg-red-500";
+      break;
+    case "orange":
+      backgroundColor = "bg-yellow-500";
+      break;
+    case "blue":
+      backgroundColor = "bg-blue-500";
+      break;
+    default:
+      break;
+  }
+  return (
+    <BadgeBase className={className} variant={variant} {...props}>
+      <span
+        className={cn(
+          "mr-1 inline-block h-1.5 w-1.5 rounded-full",
+          backgroundColor
+        )}
+      />
+      {props.children}
+    </BadgeBase>
+  );
+}
+
+export { BadgeBase, badgeVariants, Badge };
