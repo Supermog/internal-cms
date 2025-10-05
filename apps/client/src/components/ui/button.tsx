@@ -65,9 +65,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={isLoading || props.disabled}
       >
-        {leadingIcon && leadingIcon}
-        {props.children}
-        {trailingIcon && trailingIcon}
+        <>
+          {leadingIcon && leadingIcon}
+          {props.children}
+          {trailingIcon && trailingIcon}
+        </>
       </Comp>
     );
   }
