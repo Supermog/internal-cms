@@ -1,7 +1,8 @@
-import { Sidebar } from "@/features/navigation/components/sidebar";
 import { NavigationItem } from "@/features/navigation/types/navigation";
 import { Building, Home } from "lucide-react";
-import { twMerge } from "tailwind-merge";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/features/navigation/components/app-sidebar";
+import { Content } from "@/features/navigation/components/content";
 
 type MainLayoutProps = {
   children?: React.ReactNode;
@@ -16,30 +17,15 @@ const bottomNavigation: NavigationItem[] = [];
 
 function MainLayout({ children }: MainLayoutProps) {
   return (
-    <>
-      <div className={twMerge("h-screen")}>
-        {/* <MobileNavigation
-      navigation={navigation}
-      bottomNavigation={bottomNavigation}
-    /> */}
-        {/* Static sidebar for desktop */}
-        <div
-          className={twMerge(
-            "group/sidebar hidden transition-all lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:flex-col",
-            "lg:w-72"
-          )}
-        >
-          <Sidebar
-            navigation={navigation}
-            bottomNavigation={bottomNavigation}
-          />
-        </div>
-
-        <div className={twMerge("w-screen transition-all", "lg:pl-72")}>
-          <main className="py-12 px-6 h-full w-full">{children}</main>
-        </div>
+    <SidebarProvider>
+      <div className="flex h-screen">
+        <AppSidebar
+          navigation={navigation}
+          bottomNavigation={bottomNavigation}
+        />
+        <Content>{children}</Content>
       </div>
-    </>
+    </SidebarProvider>
   );
 }
 
