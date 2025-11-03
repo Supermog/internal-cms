@@ -5,6 +5,8 @@ import {
   SignInDto,
   SignUpResponseDto,
   AuthenticatedUserResponseDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
 } from '@internal-cms/shared';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from '../../types/authenticated-request.types';
@@ -40,5 +42,21 @@ export class AuthController {
     @Param('id') userId: string,
   ): Promise<AuthenticatedUserResponseDto> {
     return this.authService.getUser(userId);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }

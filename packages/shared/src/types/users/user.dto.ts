@@ -80,6 +80,24 @@ export class SignInDto {
   password: string;
 }
 
+// DTO for forgot password
+export class ForgotPasswordDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
+
+// DTO for reset password
+export class ResetPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+}
+
 // Auth-specific response types
 export interface SignUpResponseDto {
   message: string;

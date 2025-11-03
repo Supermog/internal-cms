@@ -1,6 +1,7 @@
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -15,28 +16,50 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { SignInFormData, signInSchema } from "../types/sign-in.schema";
-import supabase from "@/lib/supabase";
+import {
+  ForgotPasswordFormData,
+  forgotPasswordSchema,
+} from "../types/forgot-password.schema";
+import { authService } from "@/features/auth/auth.service";
 import { routePaths } from "@/app/config/route-paths.config";
 
-export function SignInForm() {
-  const form = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema),
+export function ForgotPasswordForm() {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const form = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  async function onSubmit(values: SignInFormData) {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
-
-    if (error) {
+  async function onSubmit(values: ForgotPasswordFormData) {
+    try {
+      await authService.forgotPassword(values.email);
+      setIsSubmitted(true);
+    } catch (error) {
       console.error(error);
+      form.setError("root", {
+        message: "Failed to send reset email. Please try again.",
+      });
     }
+  }
+
+  if (isSubmitted) {
+    return (
+      <div className="w-full max-w-md space-y-6">
+        <Alert>
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle>Check your email</AlertTitle>
+          <AlertDescription>
+            If an account with that email exists, a password reset link has been
+            sent.
+          </AlertDescription>
+        </Alert>
+        <Button variant="link" className="w-full" asChild>
+          <Link to={routePaths.signIn}>Back to Sign In</Link>
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -53,55 +76,37 @@ export function SignInForm() {
                   placeholder="olivia@classview.com"
                   {...field}
                   autoFocus
-                  autoComplete="off"
+                  autoComplete="email"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="••••••"
-                  {...field}
-                  autoComplete="off"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-between">
-          <Button variant="link" className="h-auto p-0 text-muted" asChild>
-            <Link to={routePaths.forgotPassword}>Forgot Password?</Link>
-          </Button>
-        </div>
 
         {form.formState.errors.root && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Unexpected error</AlertTitle>
+            <AlertTitle>Error</AlertTitle>
             <AlertDescription>
               {form.formState.errors.root.message}
             </AlertDescription>
           </Alert>
         )}
+
         <Button
           type="submit"
           className="w-full"
           isLoading={form.formState.isSubmitting}
         >
-          Sign In
+          Send Reset Link
         </Button>
+
+        <div className="text-center">
+          <Button variant="link" className="h-auto p-0 text-muted" asChild>
+            <Link to={routePaths.signIn}>Back to Sign In</Link>
+          </Button>
+        </div>
       </form>
     </Form>
   );

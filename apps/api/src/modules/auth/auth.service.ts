@@ -4,23 +4,50 @@ import {
   UnauthorizedException,
   NotFoundException,
 } from '@nestjs/common';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { supabaseClient } from '../../config/supabase.config';
+import { ConfigService } from '@nestjs/config';
 import {
   Database,
   AcceptInviteDto,
   SignUpResponseDto,
   AuthenticatedUserResponseDto,
   DatabaseUser,
+  ForgotPasswordDto,
+  ResetPasswordDto,
 } from '@internal-cms/shared';
 import { InviteService } from '../invite/invite.service';
 
 @Injectable()
 export class AuthService {
   private supabase: SupabaseClient<Database>;
+  private configService: ConfigService;
 
-  constructor(private inviteService: InviteService) {
+  constructor(
+    private inviteService: InviteService,
+    configService: ConfigService,
+  ) {
     this.supabase = supabaseClient;
+    this.configService = configService;
+  }
+
+  // Create a regular Supabase client for operations that need email sending
+  private getRegularSupabaseClient(): SupabaseClient<Database> {
+    const supabaseUrl = this.configService.get('SUPABASE_PROJECT_URL');
+    const supabaseAnonKey = this.configService.get('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error(
+        'Missing required Supabase environment variables: SUPABASE_PROJECT_URL and SUPABASE_ANON_KEY',
+      );
+    }
+
+    return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
   }
 
   async signUpWithInvite(
@@ -124,5 +151,121 @@ export class AuthService {
       auth_user: user.user,
       database_user: databaseUser,
     };
+  }
+
+  async forgotPassword(
+    forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
+    const { email } = forgotPasswordDto;
+
+    // Use regular client to send password reset email
+    // This will trigger Supabase to send the reset email automatically
+    const regularClient = this.getRegularSupabaseClient();
+
+    await regularClient.auth.resetPasswordForEmail(email, {
+      redirectTo: `${this.configService.get('FRONTEND_URL') || 'http://localhost:8080'}/auth/reset-password`,
+    });
+
+    // Return success message regardless to prevent email enumeration
+    // Even if there's an error, we don't want to reveal if email exists
+    return {
+      message:
+        'If an account with that email exists, a password reset link has been sent.',
+    };
+  }
+
+  async resetPassword(
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
+    const { password, token } = resetPasswordDto;
+
+    // The token from Supabase password reset email is an access_token (JWT)
+    // We'll extract the user ID from the token and update the password
+    const regularClient = this.getRegularSupabaseClient();
+
+    try {
+      let userId: string;
+
+      // First, try to use the token to get user info from Supabase
+      // Supabase access tokens contain the user ID in the 'sub' claim
+      try {
+        // Decode JWT to get user ID (without verification since we'll verify via admin API)
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+          throw new BadRequestException('Invalid token format');
+        }
+
+        const payload = JSON.parse(
+          Buffer.from(parts[1], 'base64').toString('utf-8'),
+        );
+
+        if (!payload.sub) {
+          throw new BadRequestException('Invalid token: missing user ID');
+        }
+
+        userId = payload.sub;
+
+        // Verify the user exists using admin API
+        const { data: userData, error: userError } =
+          await this.supabase.auth.admin.getUserById(userId);
+
+        if (userError || !userData.user) {
+          throw new BadRequestException('Invalid or expired reset token');
+        }
+
+        // Update the password using admin client
+        const { error: updateError } =
+          await this.supabase.auth.admin.updateUserById(userId, {
+            password,
+          });
+
+        if (updateError) {
+          throw new BadRequestException(
+            `Failed to reset password: ${updateError.message}`,
+          );
+        }
+
+        return {
+          message: 'Password has been reset successfully',
+        };
+      } catch (error) {
+        if (error instanceof BadRequestException) {
+          throw error;
+        }
+        // If JWT decode fails, try as recovery token
+        const { data: otpData, error: otpError } =
+          await regularClient.auth.verifyOtp({
+            token_hash: token,
+            type: 'recovery',
+          });
+
+        if (otpError || !otpData.user) {
+          throw new BadRequestException('Invalid or expired reset token');
+        }
+
+        userId = otpData.user.id;
+
+        // Update the password using admin client
+        const { error: updateError } =
+          await this.supabase.auth.admin.updateUserById(userId, {
+            password,
+          });
+
+        if (updateError) {
+          throw new BadRequestException(
+            `Failed to reset password: ${updateError.message}`,
+          );
+        }
+
+        return {
+          message: 'Password has been reset successfully',
+        };
+      }
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Invalid or expired reset token');
+    }
   }
 }
