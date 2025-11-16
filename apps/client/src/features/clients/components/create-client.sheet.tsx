@@ -27,11 +27,7 @@ const createClientSchema = z.object({
   name: z.string().min(1, "Required"),
   short_name: z.string().min(1, "Required"),
   support_level: z.enum(
-    Constants.public.Enums.client_support_level as readonly [
-      "NONE",
-      "BASIC",
-      "PREMIUM",
-    ]
+    Constants.public.Enums.client_support_level as ["NONE", "BASIC", "PREMIUM"]
   ),
   key_contact_email: z.string().email("Invalid email"),
   key_contact_name: z.string().min(1, "Required"),
