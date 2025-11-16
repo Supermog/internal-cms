@@ -185,7 +185,7 @@ export function CreateClientSheet({
                           }
                         />
                       </FormControl>
-                      <FormLabel className="m-0">Covered by support</FormLabel>
+                      <FormLabel className="!m-0">Covered by support</FormLabel>
                     </FormItem>
                   )}
                 />
@@ -202,7 +202,7 @@ export function CreateClientSheet({
                           }
                         />
                       </FormControl>
-                      <FormLabel className="m-0">Monthly checked</FormLabel>
+                      <FormLabel className="!m-0">Monthly checked</FormLabel>
                     </FormItem>
                   )}
                 />
@@ -219,7 +219,7 @@ export function CreateClientSheet({
                           }
                         />
                       </FormControl>
-                      <FormLabel className="m-0">Proactive support</FormLabel>
+                      <FormLabel className="!m-0">Proactive support</FormLabel>
                     </FormItem>
                   )}
                 />
