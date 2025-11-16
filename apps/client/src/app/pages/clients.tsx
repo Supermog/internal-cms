@@ -7,8 +7,11 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 import { capitalize } from "lodash-es";
 import { Badge, BadgeType } from "@/components/ui/badge";
+import { useState } from "react";
+import { CreateClientSheet } from "@/features/clients/components/create-client.sheet";
 
 function Clients() {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const {
     data: clients,
     isLoading,
@@ -76,7 +79,12 @@ function Clients() {
     <div className="space-y-4">
       <PageTitle title="Clients" description="Client overview and status" />
       <div className="flex justify-end">
-        <Button leadingIcon={<Plus className="w-4 h-4" />}>Add Client</Button>
+        <Button
+          leadingIcon={<Plus className="w-4 h-4" />}
+          onClick={() => setIsCreateOpen(true)}
+        >
+          Add Client
+        </Button>
       </div>
       <div>
         <DataTable
@@ -88,6 +96,7 @@ function Clients() {
           enableSorting={true}
         />
       </div>
+      <CreateClientSheet open={isCreateOpen} onOpenChange={setIsCreateOpen} />
     </div>
   );
 }
