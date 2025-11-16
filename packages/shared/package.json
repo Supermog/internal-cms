@@ -4,8 +4,12 @@
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "module": "dist/index.mjs",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup --watch"
   },
   "tsup": {
@@ -25,6 +29,7 @@
   "dependencies": {
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "crypto": "^1.0.1",
     "tsup": "^8.5.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.3"

@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       clients: {
@@ -26,7 +51,7 @@ export type Database = {
           key_contact_name: string
           name: string
           short_name: string
-          support_level: string
+          support_level: Database["public"]["Enums"]["client_support_level"]
           support_renewal_date: string | null
           support_status: Database["public"]["Enums"]["client_status"]
         }
@@ -41,7 +66,7 @@ export type Database = {
           key_contact_name?: string
           name?: string
           short_name?: string
-          support_level: string
+          support_level?: Database["public"]["Enums"]["client_support_level"]
           support_renewal_date?: string | null
           support_status?: Database["public"]["Enums"]["client_status"]
         }
@@ -56,7 +81,7 @@ export type Database = {
           key_contact_name?: string
           name?: string
           short_name?: string
-          support_level?: string
+          support_level?: Database["public"]["Enums"]["client_support_level"]
           support_renewal_date?: string | null
           support_status?: Database["public"]["Enums"]["client_status"]
         }
@@ -163,6 +188,7 @@ export type Database = {
     }
     Enums: {
       client_status: "HEALTHY" | "NEEDS_ATTENTION"
+      client_support_level: "NONE" | "BASIC" | "PREMIUM"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -288,9 +314,13 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       client_status: ["HEALTHY", "NEEDS_ATTENTION"],
+      client_support_level: ["NONE", "BASIC", "PREMIUM"],
     },
   },
 } as const

@@ -89,7 +89,7 @@ export function ErrorClientsTable() {
     <DataTable
       columns={columns}
       data={[]}
-      error={new Error("Network error")}
+      isError={true}
       errorTitle="Failed to load clients"
       errorMessage="Unable to fetch client data. Please check your connection."
       onErrorRetry={() => window.location.reload()}

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { useGetClients } from "@/features/clients/api/get-clients";
 import { Client } from "@internal-cms/shared";
-import { createColumnHelper } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 import { capitalize } from "lodash-es";
 import { Badge, BadgeType } from "@/components/ui/badge";
@@ -21,19 +21,17 @@ function Clients() {
     limit: 10,
   });
 
-  const columnHelper = createColumnHelper<Client>();
-
-  const columns = [
-    columnHelper.accessor("name", {
+  const columns: ColumnDef<Client, unknown>[] = [
+    {
+      accessorKey: "name",
       header: "Name",
-      id: "name",
-    }),
-    columnHelper.accessor("key_contact_name", {
+    },
+    {
+      accessorKey: "key_contact_name",
       header: "Key Contact",
-      id: "key_contact",
-      cell: (info) => {
-        const keyContactName = info.getValue();
-        const keyContactEmail = info.row.original.key_contact_email;
+      cell: ({ row, getValue }) => {
+        const keyContactName = getValue<string>();
+        const keyContactEmail = row.original.key_contact_email;
         return (
           <div>
             <p className="">{keyContactName}</p>
@@ -41,22 +39,20 @@ function Clients() {
           </div>
         );
       },
-    }),
-    columnHelper.accessor("support_level", {
+    },
+    {
+      accessorKey: "support_level",
       header: "Support Level",
-      id: "support_level",
       cell: ({ row }) => (
-        <span>{capitalize(row.getValue("support_level"))}</span>
+        <span>{capitalize(row.getValue<string>("support_level"))}</span>
       ),
-    }),
-    columnHelper.accessor("support_status", {
+    },
+    {
+      accessorKey: "support_status",
       header: "Status",
-      id: "support_status",
-      cell: (info) => {
-        const status = info.getValue();
-
+      cell: ({ getValue }) => {
+        const status = getValue<"HEALTHY" | "NEEDS_ATTENTION">();
         let type: BadgeType = "green";
-
         switch (status) {
           case "HEALTHY":
             type = "green";
@@ -65,14 +61,13 @@ function Clients() {
             type = "red";
             break;
         }
-
         return (
           <Badge variant="outline" type={type}>
             {capitalize(status)}
           </Badge>
         );
       },
-    }),
+    },
   ];
 
   return (

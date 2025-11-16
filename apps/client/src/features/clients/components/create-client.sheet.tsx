@@ -20,13 +20,19 @@ import {
 } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCreateClient } from "@/features/clients/api/create-client";
-import { CreateClientDto } from "@internal-cms/shared";
+import { CreateClientDto, Constants } from "@internal-cms/shared";
 import { useQueryClient } from "@tanstack/react-query";
 
 const createClientSchema = z.object({
   name: z.string().min(1, "Required"),
   short_name: z.string().min(1, "Required"),
-  support_level: z.string().min(1, "Required"),
+  support_level: z.enum(
+    Constants.public.Enums.client_support_level as readonly [
+      "NONE",
+      "BASIC",
+      "PREMIUM",
+    ]
+  ),
   key_contact_email: z.string().email("Invalid email"),
   key_contact_name: z.string().min(1, "Required"),
   is_covered_by_support: z.boolean().optional(),
@@ -53,7 +59,7 @@ export function CreateClientSheet({
     defaultValues: {
       name: "",
       short_name: "",
-      support_level: "",
+      support_level: "NONE",
       key_contact_email: "",
       key_contact_name: "",
       is_covered_by_support: true,
@@ -134,7 +140,19 @@ export function CreateClientSheet({
                   <FormItem>
                     <FormLabel>Support Level</FormLabel>
                     <FormControl>
-                      <Input placeholder="standard | premium" {...field} />
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      >
+                        {Constants.public.Enums.client_support_level.map(
+                          (level) => (
+                            <option key={level} value={level}>
+                              {level.charAt(0) + level.slice(1).toLowerCase()}
+                            </option>
+                          )
+                        )}
+                      </select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

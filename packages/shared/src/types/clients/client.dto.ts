@@ -7,9 +7,11 @@ import {
   IsEmail,
   Min,
   IsInt,
+  IsEnum,
 } from "class-validator";
 import { Database } from "../database/database.types";
 import { Type } from "class-transformer";
+import { Constants } from "../database/database.types";
 
 // Use the database table types directly
 export type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -26,9 +28,9 @@ export class CreateClientDto {
   @IsNotEmpty()
   short_name: string;
 
-  @IsString()
+  @IsEnum(Constants.public.Enums.client_support_level)
   @IsNotEmpty()
-  support_level: string;
+  support_level: Database["public"]["Enums"]["client_support_level"];
 
   @IsEmail()
   @IsNotEmpty()
@@ -70,8 +72,8 @@ export class UpdateClientDto {
   short_name?: string;
 
   @IsOptional()
-  @IsString()
-  support_level?: string;
+  @IsEnum(Constants.public.Enums.client_support_level)
+  support_level?: Database["public"]["Enums"]["client_support_level"];
 
   @IsOptional()
   @IsEmail()
