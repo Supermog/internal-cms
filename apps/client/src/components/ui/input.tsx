@@ -1,9 +1,25 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
+    const { inputMode, onChange, ...rest } = props;
+
+    const handleChange = React.useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (inputMode === "numeric") {
+          const value = e.target.value;
+          if (value === "" || Number(value)) {
+            onChange?.(e);
+          }
+          return;
+        }
+        onChange?.(e);
+      },
+      [inputMode, onChange]
+    );
+
     return (
       <input
         type={type}
@@ -12,11 +28,13 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className
         )}
         ref={ref}
-        {...props}
+        inputMode={inputMode}
+        onChange={handleChange}
+        {...rest}
       />
-    )
+    );
   }
-)
-Input.displayName = "Input"
+);
+Input.displayName = "Input";
 
-export { Input }
+export { Input };
