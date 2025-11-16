@@ -1,8 +1,13 @@
-// Shared validation schemas
-export * from "./schemas";
+// Shared validation schemas (export explicitly from files)
+export * from "./schemas/invite.schema";
 
-// Shared utilities
-export * from "./utils";
+// Shared utilities (export explicitly from files)
+export * from "./utils/invite-utils";
 
-// Shared types
-export * from "./types";
+// Shared types (export explicitly from files)
+export * from "./types/database/database.types";
+export * from "./types/clients/client.dto";
+export * from "./types/invites/invite.dto";
+export * from "./types/users/user.dto";
+export * from "./types/pagination/pagination";
+export * from "./types/error/error";

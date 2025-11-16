@@ -8,7 +8,7 @@ import {
   IsEnum,
 } from "class-validator";
 import { Database } from "../database/database.types";
-import { UserRole } from "../users";
+import { UserRole } from "../users/user.dto";
 
 export class CreateInviteDto {
   @IsEmail()
