@@ -25,10 +25,15 @@ const router = createBrowserRouter(
       children: [
         { path: routePaths.signIn, element: <SignIn /> },
         { path: routePaths.forgotPassword, element: <ForgotPassword /> },
-        { path: routePaths.resetPassword, element: <ResetPassword /> },
-        { path: routePaths.home, element: <Navigate to={routePaths.signIn} /> },
       ],
     },
+    {
+      element: <RouteWrapper layout={AuthLayout} />,
+      children: [
+        { path: routePaths.resetPassword, element: <ResetPassword /> },
+      ],
+    },
+    { path: "*", element: <Navigate to={routePaths.home} replace /> },
   ],
   {
     future: {

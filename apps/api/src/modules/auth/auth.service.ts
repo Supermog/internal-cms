@@ -163,7 +163,7 @@ export class AuthService {
     const regularClient = this.getRegularSupabaseClient();
 
     await regularClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${this.configService.get('FRONTEND_URL') || 'http://localhost:8080'}/auth/reset-password`,
+      redirectTo: `${this.configService.get('FRONTEND_URL') || 'http://localhost:8080'}/reset-password`,
     });
 
     // Return success message regardless to prevent email enumeration

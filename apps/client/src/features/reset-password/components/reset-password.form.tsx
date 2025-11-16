@@ -37,22 +37,22 @@ export function ResetPasswordForm() {
     const accessToken = hashParams.get("access_token");
     const queryToken = searchParams.get("token");
 
+    console.log("accessToken", accessToken);
+    console.log("queryToken", queryToken);
+
     if (accessToken) {
+      console.log("setting accessToken");
       setToken(accessToken);
-      // Clean up the URL hash to remove tokens after extracting
-      window.history.replaceState(
-        {},
-        document.title,
-        window.location.pathname + window.location.search
-      );
     } else if (queryToken) {
       setToken(queryToken);
     } else {
       form.setError("root", {
-        message: "Invalid or missing reset token. Please request a new password reset link.",
+        message:
+          "Invalid or missing reset token. Please request a new password reset link.",
       });
     }
-  }, [searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const form = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
@@ -65,7 +65,8 @@ export function ResetPasswordForm() {
   async function onSubmit(values: ResetPasswordFormData) {
     if (!token) {
       form.setError("root", {
-        message: "Invalid or missing reset token. Please request a new password reset link.",
+        message:
+          "Invalid or missing reset token. Please request a new password reset link.",
       });
       return;
     }
@@ -79,7 +80,8 @@ export function ResetPasswordForm() {
     } catch (error: any) {
       console.error(error);
       const errorMessage =
-        error?.message || "Failed to reset password. Please try again or request a new link.";
+        error?.message ||
+        "Failed to reset password. Please try again or request a new link.";
       form.setError("root", {
         message: errorMessage,
       });
