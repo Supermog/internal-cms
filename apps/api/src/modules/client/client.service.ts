@@ -11,6 +11,7 @@ import {
   UpdateClientDto,
   Client,
   PaginatedResponse,
+  DatabaseUser,
 } from '@internal-cms/shared';
 
 @Injectable()
@@ -176,5 +177,32 @@ export class ClientService {
     }
 
     return client;
+  }
+
+  async getClientUsers(clientId: string): Promise<DatabaseUser[]> {
+    // First verify client exists
+    const { data: client, error: clientError } = await this.supabase
+      .from('clients')
+      .select('id')
+      .eq('id', clientId)
+      .single();
+
+    if (clientError || !client) {
+      throw new NotFoundException('Client not found');
+    }
+
+    const { data: users, error } = await this.supabase
+      .from('users')
+      .select('*')
+      .eq('client_uid', clientId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new BadRequestException(
+        `Failed to fetch client users: ${error.message}`,
+      );
+    }
+
+    return (users || []) as DatabaseUser[];
   }
 }

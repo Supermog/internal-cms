@@ -19,6 +19,7 @@ import {
   PaginatedResponse,
   GetAllClientsQueryDto,
   UserRole,
+  DatabaseUser,
 } from '@internal-cms/shared';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from 'src/types/authenticated-request.types';
@@ -97,5 +98,16 @@ export class ClientController {
     }
 
     return this.clientService.getClient(id, databaseUser.client_uid);
+  }
+
+  @Get(':id/users')
+  async getClientUsers(@Param('id') id: string): Promise<DatabaseUser[]> {
+    const user = this.request.user;
+
+    if (user.role !== UserRole.ADMIN && user.client_uid !== id) {
+      throw new NotFoundException();
+    }
+
+    return this.clientService.getClientUsers(id);
   }
 }

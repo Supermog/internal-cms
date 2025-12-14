@@ -3,6 +3,7 @@ import { Badge, BadgeType } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetClient } from "@/features/clients/api/get-client";
+import { useGetClientUsers } from "@/features/clients/api/get-client-users";
 import { EditClientSheet } from "@/features/clients/components/edit-client.sheet";
 import { capitalize } from "lodash-es";
 import {
@@ -13,6 +14,7 @@ import {
   Mail,
   Pencil,
   User,
+  Users,
   XCircle,
 } from "lucide-react";
 import { useState } from "react";
@@ -21,6 +23,11 @@ import { useParams } from "react-router-dom";
 function ClientDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: client, isLoading, isError } = useGetClient(id!);
+  const {
+    data: users,
+    isLoading: isLoadingUsers,
+    isError: isErrorUsers,
+  } = useGetClientUsers(id!);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   if (isLoading) {
@@ -146,6 +153,48 @@ function ClientDetail() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Users Section */}
+      <div className="bg-white border rounded-lg p-6 space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Users className="w-5 h-5" />
+          Users
+        </h2>
+        {isLoadingUsers ? (
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        ) : isErrorUsers ? (
+          <p className="text-gray-500 text-sm">Failed to load users.</p>
+        ) : users && users.length > 0 ? (
+          <div className="divide-y">
+            {users.map((user) => (
+              <div
+                key={user.id}
+                className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <User className="w-5 h-5 text-gray-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{user.name}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+                <Badge variant="outline" type="blue">
+                  {capitalize(user.role ?? "User")}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">
+            No users found for this client.
+          </p>
+        )}
       </div>
 
       <EditClientSheet
