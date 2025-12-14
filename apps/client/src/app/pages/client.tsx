@@ -1,7 +1,9 @@
 import { PageTitle } from "@/components/page-title";
 import { Badge, BadgeType } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetClient } from "@/features/clients/api/get-client";
+import { EditClientSheet } from "@/features/clients/components/edit-client.sheet";
 import { capitalize } from "lodash-es";
 import {
   Building2,
@@ -9,14 +11,17 @@ import {
   CheckCircle2,
   Clock,
   Mail,
+  Pencil,
   User,
   XCircle,
 } from "lucide-react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 function ClientDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: client, isLoading, isError } = useGetClient(id!);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -49,9 +54,18 @@ function ClientDetail() {
           title={client.name}
           description={`Short name: ${client.short_name}`}
         />
-        <Badge variant="outline" type={statusType}>
-          {capitalize(client.support_status)}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            leadingIcon={<Pencil className="w-4 h-4" />}
+            onClick={() => setIsEditOpen(true)}
+          >
+            Edit
+          </Button>
+          <Badge variant="outline" type={statusType}>
+            {capitalize(client.support_status)}
+          </Badge>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -133,6 +147,12 @@ function ClientDetail() {
           </div>
         </div>
       </div>
+
+      <EditClientSheet
+        client={client}
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+      />
     </div>
   );
 }
