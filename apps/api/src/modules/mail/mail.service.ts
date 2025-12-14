@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Mailjet from 'node-mailjet';
+import { Client } from 'node-mailjet';
 
 export interface SendEmailOptions {
   to: string;
@@ -12,7 +12,7 @@ export interface SendEmailOptions {
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private mailjetClient: Mailjet | null = null;
+  private mailjetClient: Client | null = null;
   private fromEmail: string;
   private fromName: string;
 
@@ -26,7 +26,7 @@ export class MailService {
       this.configService.get<string>('MAILJET_FROM_NAME') || 'Internal CMS';
 
     if (apiKey && secretKey) {
-      this.mailjetClient = new Mailjet({
+      this.mailjetClient = new Client({
         apiKey,
         apiSecret: secretKey,
       });
