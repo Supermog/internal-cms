@@ -10,6 +10,7 @@ import { Dashboard } from "./pages/dashboard";
 import { AuthGuard } from "@/features/auth/guards/auth-guard";
 import { MainLayout } from "./layouts/main.layout";
 import { Clients } from "./pages/clients";
+import { ClientDetail } from "./pages/client";
 
 const router = createBrowserRouter(
   [
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
       children: [
         { path: routePaths.home, element: <Dashboard /> },
         { path: routePaths.clients, element: <Clients /> },
+        { path: routePaths.clientDetail, element: <ClientDetail /> },
       ],
     },
     {

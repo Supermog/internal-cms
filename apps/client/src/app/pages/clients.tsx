@@ -4,13 +4,16 @@ import { DataTable } from "@/components/ui/data-table";
 import { useGetClients } from "@/features/clients/api/get-clients";
 import { Client } from "@internal-cms/shared";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 import { capitalize } from "lodash-es";
 import { Badge, BadgeType } from "@/components/ui/badge";
 import { useState } from "react";
 import { CreateClientSheet } from "@/features/clients/components/create-client.sheet";
+import { generatePath, useNavigate } from "react-router-dom";
+import { routePaths } from "../config/route-paths.config";
 
 function Clients() {
+  const navigate = useNavigate();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const {
     data: clients,
@@ -67,6 +70,23 @@ function Clients() {
           </Badge>
         );
       },
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() =>
+            navigate(
+              generatePath(routePaths.clientDetail, { id: row.original.id })
+            )
+          }
+        >
+          <Eye className="w-4 h-4" />
+        </Button>
+      ),
     },
   ];
 

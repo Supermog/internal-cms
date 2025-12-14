@@ -4,4 +4,5 @@ export const routePaths = Object.freeze({
   forgotPassword: "/auth/forgot-password",
   resetPassword: "/reset-password",
   clients: "/clients",
+  clientDetail: "/clients/:id",
 });
