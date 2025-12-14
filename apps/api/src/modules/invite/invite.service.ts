@@ -12,12 +12,13 @@ import {
   InviteStatus,
 } from '@internal-cms/shared';
 import { v4 as uuidv4 } from 'uuid';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class InviteService {
   private supabase: SupabaseClient<Database>;
 
-  constructor() {
+  constructor(private readonly mailService: MailService) {
     this.supabase = supabaseClient;
   }
 
@@ -58,6 +59,10 @@ export class InviteService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
+    // Send invite email first - if this fails, we don't create the invite
+    await this.mailService.sendInviteEmail(email, code, name);
+
+    // Email sent successfully, now create the invite
     const { data: invite, error } = await this.supabase
       .from('invites')
       .insert({
