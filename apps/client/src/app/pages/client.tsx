@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useGetClient } from "@/features/clients/api/get-client";
 import { useGetClientUsers } from "@/features/clients/api/get-client-users";
 import { EditClientSheet } from "@/features/clients/components/edit-client.sheet";
+import { AddUserSheet } from "@/features/clients/components/add-user.sheet";
 import { capitalize } from "lodash-es";
 import {
   Building2,
@@ -13,6 +14,7 @@ import {
   Clock,
   Mail,
   Pencil,
+  Plus,
   User,
   Users,
   XCircle,
@@ -29,6 +31,7 @@ function ClientDetail() {
     isError: isErrorUsers,
   } = useGetClientUsers(id!);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -157,10 +160,19 @@ function ClientDetail() {
 
       {/* Users Section */}
       <div className="bg-white border rounded-lg p-6 space-y-4">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Users className="w-5 h-5" />
-          Users
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Users
+          </h2>
+          <Button
+            variant="outline"
+            leadingIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsAddUserOpen(true)}
+          >
+            Add User
+          </Button>
+        </div>
         {isLoadingUsers ? (
           <div className="space-y-3">
             <Skeleton className="h-12 w-full" />
@@ -201,6 +213,11 @@ function ClientDetail() {
         client={client}
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
+      />
+      <AddUserSheet
+        client={client}
+        open={isAddUserOpen}
+        onOpenChange={setIsAddUserOpen}
       />
     </div>
   );
