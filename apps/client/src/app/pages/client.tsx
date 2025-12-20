@@ -26,7 +26,7 @@ function ClientDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: client, isLoading, isError } = useGetClient(id!);
   const {
-    data: users,
+    data: usersAndInvites,
     isLoading: isLoadingUsers,
     isError: isErrorUsers,
   } = useGetClientUsers(id!);
@@ -180,28 +180,77 @@ function ClientDetail() {
           </div>
         ) : isErrorUsers ? (
           <p className="text-gray-500 text-sm">Failed to load users.</p>
-        ) : users && users.length > 0 ? (
-          <div className="divide-y">
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                    <User className="w-5 h-5 text-gray-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
-                  </div>
+        ) : usersAndInvites ? (
+          <>
+            {usersAndInvites.users && usersAndInvites.users.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Active Users
+                </h3>
+                <div className="divide-y">
+                  {usersAndInvites.users.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                          <User className="w-5 h-5 text-gray-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" type="blue">
+                        {capitalize(user.role ?? "User")}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
-                <Badge variant="outline" type="blue">
-                  {capitalize(user.role ?? "User")}
-                </Badge>
               </div>
-            ))}
-          </div>
+            )}
+            {usersAndInvites.invites && usersAndInvites.invites.length > 0 && (
+              <div className="space-y-4 mt-6">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Pending Invitations
+                </h3>
+                <div className="divide-y">
+                  {usersAndInvites.invites
+                    .filter((invite) => invite.status === "pending")
+                    .map((invite) => (
+                      <div
+                        key={invite.id}
+                        className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                            <Mail className="w-5 h-5 text-gray-500" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{invite.name}</p>
+                            <p className="text-sm text-gray-500">
+                              {invite.email}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" type="orange">
+                          Pending
+                        </Badge>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+            {(!usersAndInvites.users || usersAndInvites.users.length === 0) &&
+              (!usersAndInvites.invites ||
+                usersAndInvites.invites.filter((i) => i.status === "pending")
+                  .length === 0) && (
+                <p className="text-gray-500 text-sm">
+                  No users or pending invitations found for this client.
+                </p>
+              )}
+          </>
         ) : (
           <p className="text-gray-500 text-sm">
             No users found for this client.

@@ -1,11 +1,14 @@
 import { axiosClient } from "@/lib/axios";
-import { DatabaseUser, HttpError } from "@internal-cms/shared";
+import {
+  HttpError,
+  GetClientUsersAndInvitesResponseDto,
+} from "@internal-cms/shared";
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 export async function getClientUsers(
   clientId: string
-): Promise<DatabaseUser[]> {
-  const response = await axiosClient.get<DatabaseUser[]>(
+): Promise<GetClientUsersAndInvitesResponseDto> {
+  const response = await axiosClient.get<GetClientUsersAndInvitesResponseDto>(
     `/clients/${clientId}/users`
   );
 
@@ -16,7 +19,7 @@ const queryKey = (clientId: string) => ["client", clientId, "users"];
 
 export function useGetClientUsers(
   clientId: string,
-  queryOptions?: UseQueryOptions<DatabaseUser[], HttpError>
+  queryOptions?: UseQueryOptions<GetClientUsersAndInvitesResponseDto, HttpError>
 ) {
   return useQuery({
     queryKey: queryKey(clientId),

@@ -8,7 +8,7 @@ import {
   IsEnum,
 } from "class-validator";
 import { Database } from "../database/database.types";
-import { UserRole } from "../users/user.dto";
+import { UserRole, DatabaseUser } from "../users/user.dto";
 
 export class CreateInviteDto {
   @IsEmail()
@@ -83,5 +83,10 @@ export interface DeleteInviteResponseDto {
 }
 
 export interface GetInvitesByCreatorResponseDto {
+  invites: Invite[];
+}
+
+export interface GetClientUsersAndInvitesResponseDto {
+  users: DatabaseUser[];
   invites: Invite[];
 }

@@ -12,6 +12,8 @@ import {
   Client,
   PaginatedResponse,
   DatabaseUser,
+  Invite,
+  GetClientUsersAndInvitesResponseDto,
 } from '@internal-cms/shared';
 
 @Injectable()
@@ -179,7 +181,9 @@ export class ClientService {
     return client;
   }
 
-  async getClientUsers(clientId: string): Promise<DatabaseUser[]> {
+  async getClientUsers(
+    clientId: string,
+  ): Promise<GetClientUsersAndInvitesResponseDto> {
     // First verify client exists
     const { data: client, error: clientError } = await this.supabase
       .from('clients')
@@ -191,18 +195,35 @@ export class ClientService {
       throw new NotFoundException('Client not found');
     }
 
-    const { data: users, error } = await this.supabase
+    // Fetch users
+    const { data: users, error: usersError } = await this.supabase
       .from('users')
       .select('*')
       .eq('client_uid', clientId)
       .order('created_at', { ascending: false });
 
-    if (error) {
+    if (usersError) {
       throw new BadRequestException(
-        `Failed to fetch client users: ${error.message}`,
+        `Failed to fetch client users: ${usersError.message}`,
       );
     }
 
-    return (users || []) as DatabaseUser[];
+    // Fetch invites for this client
+    const { data: invites, error: invitesError } = await this.supabase
+      .from('invites')
+      .select('*')
+      .eq('client_uid', clientId)
+      .order('created_at', { ascending: false });
+
+    if (invitesError) {
+      throw new BadRequestException(
+        `Failed to fetch client invites: ${invitesError.message}`,
+      );
+    }
+
+    return {
+      users: (users || []) as DatabaseUser[],
+      invites: (invites || []) as Invite[],
+    };
   }
 }

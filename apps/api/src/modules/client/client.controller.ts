@@ -19,7 +19,7 @@ import {
   PaginatedResponse,
   GetAllClientsQueryDto,
   UserRole,
-  DatabaseUser,
+  GetClientUsersAndInvitesResponseDto,
 } from '@internal-cms/shared';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from 'src/types/authenticated-request.types';
@@ -101,7 +101,9 @@ export class ClientController {
   }
 
   @Get(':id/users')
-  async getClientUsers(@Param('id') id: string): Promise<DatabaseUser[]> {
+  async getClientUsers(
+    @Param('id') id: string,
+  ): Promise<GetClientUsersAndInvitesResponseDto> {
     const user = this.request.user;
 
     if (user.role !== UserRole.ADMIN && user.client_uid !== id) {
