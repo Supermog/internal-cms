@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Delete,
   Body,
   Param,
@@ -60,6 +61,12 @@ export class InviteController {
     } catch (error) {
       return { valid: false, message: error.message };
     }
+  }
+
+  @Public()
+  @Get('by-code/:code')
+  async getInviteByCode(@Param('code') code: string): Promise<Invite> {
+    return this.inviteService.getInviteByCode(code);
   }
 
   @Delete(':id')

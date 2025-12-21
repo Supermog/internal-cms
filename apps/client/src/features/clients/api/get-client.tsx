@@ -8,14 +8,14 @@ export async function getClient(id: string): Promise<Client> {
   return response.data;
 }
 
-const queryKey = (id: string) => ["client", id];
+export const getClientQueryKey = (id: string) => ["client", id];
 
 export function useGetClient(
   id: string,
   queryOptions?: UseQueryOptions<Client, HttpError>
 ) {
   return useQuery({
-    queryKey: queryKey(id),
+    queryKey: getClientQueryKey(id),
     queryFn: () => getClient(id),
     enabled: !!id,
     ...queryOptions,

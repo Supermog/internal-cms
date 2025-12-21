@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RouteWrapper } from "./route-wrapper";
 import { routePaths } from "./config/route-paths.config";
 import { SignIn } from "./pages/auth/sign-in";
+import { SignUp } from "./pages/auth/sign-up";
 import { ForgotPassword } from "./pages/auth/forgot-password";
 import { ResetPassword } from "./pages/auth/reset-password";
 import { AuthLayout } from "./layouts/auth.layout";
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
       element: <RouteWrapper guard={GuestGuard} layout={AuthLayout} />,
       children: [
         { path: routePaths.signIn, element: <SignIn /> },
+        { path: routePaths.signUp, element: <SignUp /> },
         { path: routePaths.forgotPassword, element: <ForgotPassword /> },
       ],
     },

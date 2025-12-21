@@ -22,6 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useCreateClient } from "@/features/clients/api/create-client";
 import { CreateClientDto, Constants } from "@internal-cms/shared";
 import { useQueryClient } from "@tanstack/react-query";
+import { clientsQueryKey } from "@/features/clients/api/get-clients";
 
 const createClientSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -68,7 +69,7 @@ export function CreateClientSheet({
 
   const createClientMutation = useCreateClient({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["clients"] });
+      await queryClient.invalidateQueries({ queryKey: clientsQueryKey });
       onOpenChange(false);
       form.reset();
     },

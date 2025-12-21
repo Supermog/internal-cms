@@ -23,6 +23,8 @@ import { useUpdateClient } from "@/features/clients/api/update-client";
 import { Client, UpdateClientDto, Constants } from "@internal-cms/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { getClientQueryKey } from "@/features/clients/api/get-client";
+import { clientsQueryKey } from "@/features/clients/api/get-clients";
 
 const editClientSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -87,8 +89,10 @@ export function EditClientSheet({
 
   const updateClientMutation = useUpdateClient({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["client", client.id] });
-      await queryClient.invalidateQueries({ queryKey: ["clients"] });
+      await queryClient.invalidateQueries({
+        queryKey: getClientQueryKey(client.id),
+      });
+      await queryClient.invalidateQueries({ queryKey: clientsQueryKey });
       onOpenChange(false);
     },
   });

@@ -18,14 +18,18 @@ export async function getClients(
   return response.data;
 }
 
-const queryKey = (params: GetAllClientsQueryDto) => ["clients", params];
+export const getClientsQueryKey = (params: GetAllClientsQueryDto) => [
+  "clients",
+  params,
+];
+export const clientsQueryKey = ["clients"] as const;
 
 export function useGetClients(
   params: GetAllClientsQueryDto,
   queryOptions?: UseQueryOptions<PaginatedResponse<Client>, HttpError>
 ) {
   return useQuery({
-    queryKey: queryKey(params),
+    queryKey: getClientsQueryKey(params),
     queryFn: () => getClients(params),
     ...queryOptions,
   });

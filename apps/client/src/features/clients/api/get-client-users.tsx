@@ -15,14 +15,18 @@ export async function getClientUsers(
   return response.data;
 }
 
-const queryKey = (clientId: string) => ["client", clientId, "users"];
+export const getClientUsersQueryKey = (clientId: string) => [
+  "client",
+  clientId,
+  "users",
+];
 
 export function useGetClientUsers(
   clientId: string,
   queryOptions?: UseQueryOptions<GetClientUsersAndInvitesResponseDto, HttpError>
 ) {
   return useQuery({
-    queryKey: queryKey(clientId),
+    queryKey: getClientUsersQueryKey(clientId),
     queryFn: () => getClientUsers(clientId),
     enabled: !!clientId,
     ...queryOptions,
