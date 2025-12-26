@@ -2,11 +2,14 @@ import { PageTitle } from "@/components/page-title";
 import { Badge, BadgeType } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 import { useGetClient } from "@/features/clients/api/get-client";
 import { useGetClientUsers } from "@/features/clients/api/get-client-users";
 import { EditClientSheet } from "@/features/clients/components/edit-client.sheet";
 import { AddUserSheet } from "@/features/clients/components/add-user.sheet";
 import { EditInviteSheet } from "@/features/clients/components/edit-invite.sheet";
+import { useDeleteInvite } from "@/features/invites/api/delete-invite";
+import { useDeleteUser } from "@/features/users/api/delete-user";
 import { capitalize } from "lodash-es";
 import {
   Building2,
@@ -16,12 +19,15 @@ import {
   Mail,
   Pencil,
   Plus,
+  Trash2,
   User,
   Users,
   XCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { getClientUsersQueryKey } from "@/features/clients/api/get-client-users";
 
 function ClientDetail() {
   const { id } = useParams<{ id: string }>();
@@ -31,11 +37,36 @@ function ClientDetail() {
     isLoading: isLoadingUsers,
     isError: isErrorUsers,
   } = useGetClientUsers(id!);
+  const queryClient = useQueryClient();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [editingInvite, setEditingInvite] = useState<{
     id: string;
   } | null>(null);
+  const [deleting, setDeleting] = useState<{
+    type: "user" | "invite";
+    id: string;
+    name: string;
+    email: string;
+  } | null>(null);
+
+  const deleteUserMutation = useDeleteUser({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getClientUsersQueryKey(id!),
+      });
+      setDeleting(null);
+    },
+  });
+
+  const deleteInviteMutation = useDeleteInvite({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getClientUsersQueryKey(id!),
+      });
+      setDeleting(null);
+    },
+  });
 
   if (isLoading) {
     return (
@@ -210,9 +241,25 @@ function ClientDetail() {
                           <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
                       </div>
-                      <Badge variant="outline" type="blue">
-                        {capitalize(user.role ?? "User")}
-                      </Badge>
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline" type="blue">
+                          {capitalize(user.role ?? "User")}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setDeleting({
+                              type: "user",
+                              id: user.id,
+                              name: user.name,
+                              email: user.email,
+                            })
+                          }
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -254,6 +301,20 @@ function ClientDetail() {
                           }
                         >
                           <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setDeleting({
+                              type: "invite",
+                              id: invite.id,
+                              name: invite.name,
+                              email: invite.email,
+                            })
+                          }
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
                         </Button>
                       </div>
                     </div>
@@ -303,6 +364,30 @@ function ClientDetail() {
           }}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={!!deleting}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleting(null);
+          }
+        }}
+        title={`Delete ${deleting?.type === "user" ? "User" : "Invitation"}`}
+        description={`Are you sure you want to delete ${deleting?.name} (${deleting?.email})? This action cannot be undone.`}
+        onConfirm={() => {
+          if (deleting) {
+            if (deleting.type === "user") {
+              deleteUserMutation.mutate(deleting.id);
+            } else {
+              deleteInviteMutation.mutate(deleting.id);
+            }
+          }
+        }}
+        isLoading={
+          deleteUserMutation.isPending || deleteInviteMutation.isPending
+        }
+      />
     </div>
   );
 }

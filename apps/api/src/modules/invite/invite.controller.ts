@@ -97,6 +97,20 @@ export class InviteController {
   async deleteInvite(
     @Param('id') inviteId: string,
   ): Promise<DeleteInviteResponseDto> {
+    const user = this.request.user;
+
+    // Get the invite to check authorization
+    const existingInvite = await this.inviteService.getInviteById(inviteId);
+
+    if (
+      user.role !== UserRole.ADMIN &&
+      existingInvite.client_uid !== user.client_uid
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to delete this invite',
+      );
+    }
+
     await this.inviteService.deleteInvite(inviteId);
     return { message: 'Invite deleted successfully' };
   }

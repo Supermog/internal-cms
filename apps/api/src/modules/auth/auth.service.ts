@@ -314,4 +314,39 @@ export class AuthService {
 
     return user;
   }
+
+  async deleteUser(userId: string): Promise<void> {
+    // First check if user exists
+    const { data: existingUser, error: existsError } = await this.supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (existsError || !existingUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Delete from auth (this will also handle related data)
+    const { error: authError } =
+      await this.supabase.auth.admin.deleteUser(userId);
+
+    if (authError) {
+      throw new BadRequestException(
+        `Failed to delete user: ${authError.message}`,
+      );
+    }
+
+    // Delete from users table (cascade should handle this, but being explicit)
+    const { error: dbError } = await this.supabase
+      .from('users')
+      .delete()
+      .eq('id', userId);
+
+    if (dbError) {
+      throw new BadRequestException(
+        `Failed to delete user from database: ${dbError.message}`,
+      );
+    }
+  }
 }

@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Patch,
+  Delete,
   Body,
   Param,
   Inject,
@@ -19,6 +20,7 @@ import {
   UpdateUserDto,
   DatabaseUser,
   UserRole,
+  DeleteUserResponseDto,
 } from '@internal-cms/shared';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from '../../types/authenticated-request.types';
@@ -92,5 +94,27 @@ export class AuthController {
     }
 
     return this.authService.updateUser(userId, updateUserDto);
+  }
+
+  @Delete('user/:id')
+  async deleteUser(
+    @Param('id') userId: string,
+  ): Promise<DeleteUserResponseDto> {
+    const user = this.request.user;
+
+    // Get the user to check authorization
+    const existingUser = await this.authService.getDatabaseUserById(userId);
+
+    if (
+      user.role !== UserRole.ADMIN &&
+      existingUser.client_uid !== user.client_uid
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to delete this user',
+      );
+    }
+
+    await this.authService.deleteUser(userId);
+    return { message: 'User deleted successfully' };
   }
 }
