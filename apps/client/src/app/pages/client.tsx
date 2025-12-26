@@ -11,6 +11,7 @@ import { EditInviteSheet } from "@/features/clients/components/edit-invite.sheet
 import { ClientContactSection } from "@/features/clients/components/client-contact-section";
 import { ClientSupportDetailsSection } from "@/features/clients/components/client-support-details-section";
 import { ClientSupportFeaturesSection } from "@/features/clients/components/client-support-features-section";
+import { ClientSupportMonthsSection } from "@/features/clients/components/client-support-months-section";
 import { ClientUsersSection } from "@/features/clients/components/client-users-section";
 import { useDeleteInvite } from "@/features/invites/api/delete-invite";
 import { useDeleteUser } from "@/features/users/api/delete-user";
@@ -110,6 +111,8 @@ function ClientDetail() {
         <ClientSupportDetailsSection client={client} />
         <ClientSupportFeaturesSection client={client} />
       </div>
+
+      <ClientSupportMonthsSection client={client} />
 
       <ClientUsersSection
         clientId={id!}

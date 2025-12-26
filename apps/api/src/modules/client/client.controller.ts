@@ -112,4 +112,18 @@ export class ClientController {
 
     return this.clientService.getClientUsers(id);
   }
+
+  @Get(':id/support-months')
+  async getClientSupportMonths(
+    @Param('id') id: string,
+    @Query('year') year?: number,
+  ) {
+    const user = this.request.user;
+
+    if (user.role !== UserRole.ADMIN && user.client_uid !== id) {
+      throw new NotFoundException();
+    }
+
+    return this.clientService.getClientSupportMonths(id, year);
+  }
 }

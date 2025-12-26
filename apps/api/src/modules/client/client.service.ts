@@ -226,4 +226,40 @@ export class ClientService {
       invites: (invites || []) as Invite[],
     };
   }
+
+  async getClientSupportMonths(
+    clientId: string,
+    year?: number,
+  ): Promise<Database['public']['Tables']['client_support_months']['Row'][]> {
+    // First verify client exists
+    const { data: client, error: clientError } = await this.supabase
+      .from('clients')
+      .select('id')
+      .eq('id', clientId)
+      .single();
+
+    if (clientError || !client) {
+      throw new NotFoundException('Client not found');
+    }
+
+    const targetYear = year || new Date().getFullYear();
+    const startDate = `${targetYear}-01-01`;
+    const endDate = `${targetYear}-12-31`;
+
+    const { data: supportMonths, error } = await this.supabase
+      .from('client_support_months')
+      .select('*')
+      .eq('client_id', clientId)
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: true });
+
+    if (error) {
+      throw new BadRequestException(
+        `Failed to fetch support months: ${error.message}`,
+      );
+    }
+
+    return supportMonths || [];
+  }
 }
