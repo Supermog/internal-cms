@@ -6,6 +6,7 @@ import { useGetClient } from "@/features/clients/api/get-client";
 import { useGetClientUsers } from "@/features/clients/api/get-client-users";
 import { EditClientSheet } from "@/features/clients/components/edit-client.sheet";
 import { AddUserSheet } from "@/features/clients/components/add-user.sheet";
+import { EditInviteSheet } from "@/features/clients/components/edit-invite.sheet";
 import { capitalize } from "lodash-es";
 import {
   Building2,
@@ -32,6 +33,9 @@ function ClientDetail() {
   } = useGetClientUsers(id!);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [editingInvite, setEditingInvite] = useState<{
+    id: string;
+  } | null>(null);
 
   if (isLoading) {
     return (
@@ -56,6 +60,10 @@ function ClientDetail() {
 
   const statusType: BadgeType =
     client.support_status === "HEALTHY" ? "green" : "red";
+
+  const pendingInvitations = usersAndInvites?.invites?.filter(
+    (invite) => invite.status === "pending"
+  );
 
   return (
     <div className="space-y-6">
@@ -210,35 +218,46 @@ function ClientDetail() {
                 </div>
               </div>
             )}
-            {usersAndInvites.invites && usersAndInvites.invites.length > 0 && (
+            {pendingInvitations && pendingInvitations.length > 0 && (
               <div className="space-y-4 mt-6">
                 <h3 className="text-sm font-medium text-gray-700">
                   Pending Invitations
                 </h3>
                 <div className="divide-y">
-                  {usersAndInvites.invites
-                    .filter((invite) => invite.status === "pending")
-                    .map((invite) => (
-                      <div
-                        key={invite.id}
-                        className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                            <Mail className="w-5 h-5 text-gray-500" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{invite.name}</p>
-                            <p className="text-sm text-gray-500">
-                              {invite.email}
-                            </p>
-                          </div>
+                  {pendingInvitations.map((invite) => (
+                    <div
+                      key={invite.id}
+                      className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                          <Mail className="w-5 h-5 text-gray-500" />
                         </div>
+                        <div>
+                          <p className="font-medium">{invite.name}</p>
+                          <p className="text-sm text-gray-500">
+                            {invite.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
                         <Badge variant="outline" type="orange">
                           Pending
                         </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setEditingInvite({
+                              id: invite.id,
+                            })
+                          }
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
                       </div>
-                    ))}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -268,6 +287,22 @@ function ClientDetail() {
         open={isAddUserOpen}
         onOpenChange={setIsAddUserOpen}
       />
+      {editingInvite && (
+        <EditInviteSheet
+          client={client}
+          invite={
+            editingInvite
+              ? usersAndInvites?.invites.find((i) => i.id === editingInvite.id)
+              : undefined
+          }
+          open={!!editingInvite}
+          onOpenChange={(open: boolean) => {
+            if (!open) {
+              setEditingInvite(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
   Database,
   Invite,
   CreateInviteDto,
+  UpdateInviteDto,
   InviteStatus,
 } from '@internal-cms/shared';
 import { v4 as uuidv4 } from 'uuid';
@@ -163,6 +164,53 @@ export class InviteService {
 
     if (error || !invite) {
       throw new NotFoundException('Invite not found');
+    }
+
+    return invite;
+  }
+
+  async getInviteById(inviteId: string): Promise<Invite> {
+    const { data: invite, error } = await this.supabase
+      .from('invites')
+      .select('*')
+      .eq('id', inviteId)
+      .single();
+
+    if (error || !invite) {
+      throw new NotFoundException('Invite not found');
+    }
+
+    return invite;
+  }
+
+  async updateInvite(
+    inviteId: string,
+    updateInviteDto: UpdateInviteDto,
+  ): Promise<Invite> {
+    // First check if invite exists
+    const { data: existingInvite, error: existsError } = await this.supabase
+      .from('invites')
+      .select('id')
+      .eq('id', inviteId)
+      .single();
+
+    if (existsError || !existingInvite) {
+      throw new NotFoundException('Invite not found');
+    }
+
+    const { data: invite, error } = await this.supabase
+      .from('invites')
+      .update({
+        ...(updateInviteDto.name && { name: updateInviteDto.name }),
+      })
+      .eq('id', inviteId)
+      .select('*')
+      .single();
+
+    if (error) {
+      throw new BadRequestException(
+        `Failed to update invite: ${error.message}`,
+      );
     }
 
     return invite;

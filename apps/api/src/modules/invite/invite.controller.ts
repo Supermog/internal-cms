@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Delete,
+  Patch,
   Body,
   Param,
   Inject,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   CreateInviteDto,
+  UpdateInviteDto,
   ValidateInviteResponseDto,
   DeleteInviteResponseDto,
   Invite,
@@ -67,6 +69,28 @@ export class InviteController {
   @Get('by-code/:code')
   async getInviteByCode(@Param('code') code: string): Promise<Invite> {
     return this.inviteService.getInviteByCode(code);
+  }
+
+  @Patch(':id')
+  async updateInvite(
+    @Param('id') inviteId: string,
+    @Body() updateInviteDto: UpdateInviteDto,
+  ): Promise<Invite> {
+    const user = this.request.user;
+
+    // Get the invite to check authorization
+    const existingInvite = await this.inviteService.getInviteById(inviteId);
+
+    if (
+      user.role !== UserRole.ADMIN &&
+      existingInvite.client_uid !== user.client_uid
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to update this invite',
+      );
+    }
+
+    return this.inviteService.updateInvite(inviteId, updateInviteDto);
   }
 
   @Delete(':id')

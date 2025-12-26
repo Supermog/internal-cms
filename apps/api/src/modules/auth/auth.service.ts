@@ -15,6 +15,7 @@ import {
   DatabaseUser,
   ForgotPasswordDto,
   ResetPasswordDto,
+  UpdateUserDto,
 } from '@internal-cms/shared';
 import { InviteService } from '../invite/invite.service';
 
@@ -153,6 +154,20 @@ export class AuthService {
     };
   }
 
+  async getDatabaseUserById(userId: string): Promise<DatabaseUser> {
+    const { data: user, error } = await this.supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single<DatabaseUser>();
+
+    if (error || !user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   async forgotPassword(
     forgotPasswordDto: ForgotPasswordDto,
   ): Promise<{ message: string }> {
@@ -267,5 +282,36 @@ export class AuthService {
       }
       throw new BadRequestException('Invalid or expired reset token');
     }
+  }
+
+  async updateUser(
+    userId: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<DatabaseUser> {
+    // First check if user exists
+    const { data: existingUser, error: existsError } = await this.supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (existsError || !existingUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    const { data: user, error } = await this.supabase
+      .from('users')
+      .update({
+        ...(updateUserDto.name && { name: updateUserDto.name }),
+      })
+      .eq('id', userId)
+      .select('*')
+      .single<DatabaseUser>();
+
+    if (error) {
+      throw new BadRequestException(`Failed to update user: ${error.message}`);
+    }
+
+    return user;
   }
 }

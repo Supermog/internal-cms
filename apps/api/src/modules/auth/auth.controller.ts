@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Body, Param, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Body,
+  Param,
+  Inject,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   AcceptInviteDto,
@@ -7,6 +16,9 @@ import {
   AuthenticatedUserResponseDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  UpdateUserDto,
+  DatabaseUser,
+  UserRole,
 } from '@internal-cms/shared';
 import { REQUEST } from '@nestjs/core';
 import { AuthenticatedRequest } from '../../types/authenticated-request.types';
@@ -58,5 +70,27 @@ export class AuthController {
     @Body() resetPasswordDto: ResetPasswordDto,
   ): Promise<{ message: string }> {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Patch('user/:id')
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<DatabaseUser> {
+    const user = this.request.user;
+
+    // Get the user to check authorization
+    const existingUser = await this.authService.getDatabaseUserById(userId);
+
+    if (
+      user.role !== UserRole.ADMIN &&
+      existingUser.client_uid !== user.client_uid
+    ) {
+      throw new ForbiddenException(
+        'You are not authorized to update this user',
+      );
+    }
+
+    return this.authService.updateUser(userId, updateUserDto);
   }
 }

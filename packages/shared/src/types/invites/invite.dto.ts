@@ -49,6 +49,13 @@ export class AcceptInviteDto {
   name!: string;
 }
 
+export class UpdateInviteDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
+}
+
 export enum InviteStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
