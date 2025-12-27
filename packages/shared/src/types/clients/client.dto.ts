@@ -8,10 +8,42 @@ import {
   Min,
   IsInt,
   IsEnum,
+  ValidateIf,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  registerDecorator,
+  ValidationOptions,
 } from "class-validator";
 import { Database } from "../database/database.types";
 import { Type } from "class-transformer";
 import { Constants } from "../database/database.types";
+import { isFuture } from "date-fns";
+
+@ValidatorConstraint({ name: "isNotPastDate", async: false })
+class IsNotPastDateConstraint implements ValidatorConstraintInterface {
+  validate(dateString: string, args: ValidationArguments) {
+    if (!dateString) return true; // Allow empty/undefined dates
+    const date = new Date(dateString);
+    return isFuture(date);
+  }
+
+  defaultMessage(args: ValidationArguments) {
+    return `${args.property} cannot be in the past`;
+  }
+}
+
+function IsNotPastDate(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      constraints: [],
+      validator: IsNotPastDateConstraint,
+    });
+  };
+}
 
 // Use the database table types directly
 export type Client = Database["public"]["Tables"]["clients"]["Row"];
@@ -58,6 +90,10 @@ export class CreateClientDto {
 
   @IsOptional()
   @IsString()
+  @ValidateIf(
+    (o) => o.support_renewal_date !== undefined && o.support_renewal_date !== ""
+  )
+  @IsNotPastDate()
   support_renewal_date?: string;
 }
 
@@ -101,6 +137,10 @@ export class UpdateClientDto {
 
   @IsOptional()
   @IsString()
+  @ValidateIf(
+    (o) => o.support_renewal_date !== undefined && o.support_renewal_date !== ""
+  )
+  @IsNotPastDate()
   support_renewal_date?: string;
 }
 

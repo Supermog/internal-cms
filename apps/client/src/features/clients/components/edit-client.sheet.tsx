@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isFuture } from "date-fns";
 import {
   Form,
   FormControl,
@@ -38,7 +39,19 @@ const editClientSchema = z.object({
   is_monthly_checked: z.boolean().optional(),
   is_proactive_support: z.boolean().optional(),
   hours_per_month: z.coerce.number().optional(),
-  support_renewal_date: z.string().optional(),
+  support_renewal_date: z
+    .string()
+    .optional()
+    .refine(
+      (date) => {
+        if (!date || date.length === 0) return true;
+        const selectedDate = new Date(date);
+        return isFuture(selectedDate);
+      },
+      {
+        message: "Support renewal date cannot be in the past",
+      }
+    ),
 });
 
 type EditClientFormValues = z.infer<typeof editClientSchema>;
