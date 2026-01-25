@@ -9,5 +9,6 @@ export * from "./types/database/database.types";
 export * from "./types/clients/client.dto";
 export * from "./types/invites/invite.dto";
 export * from "./types/users/user.dto";
+export * from "./types/support-months/support-months.dto";
 export * from "./types/pagination/pagination";
 export * from "./types/error/error";

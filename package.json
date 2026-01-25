@@ -8,13 +8,15 @@
     "apps/*"
   ],
   "devDependencies": {
+    "dotenv-cli": "^11.0.0",
     "supabase": "^2.67.1",
     "turbo": "^2.5.4"
   },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "start": "node apps/api/dist/main"
+    "start": "node apps/api/dist/main",
+    "supabase:types": "dotenv -e .env supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > packages/shared/src/types/database/database.types.ts"
   },
   "dependencies": {
     "@nestjs/passport": "^11.0.5",

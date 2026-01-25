@@ -19,7 +19,7 @@ export type Database = {
           client_id: string;
           created_at: string;
           date: string;
-          id: number;
+          id: string;
           rolled_over_from_last_month: number | null;
           rollover_hours: number | null;
           spent_support_hours: number;
@@ -29,7 +29,7 @@ export type Database = {
           client_id: string;
           created_at?: string;
           date: string;
-          id?: number;
+          id?: string;
           rolled_over_from_last_month?: number | null;
           rollover_hours?: number | null;
           spent_support_hours?: number;
@@ -39,21 +39,13 @@ export type Database = {
           client_id?: string;
           created_at?: string;
           date?: string;
-          id?: number;
+          id?: string;
           rolled_over_from_last_month?: number | null;
           rollover_hours?: number | null;
           spent_support_hours?: number;
           total_support_hours?: number;
         };
-        Relationships: [
-          {
-            foreignKeyName: "client_support_months_client_id_fkey";
-            columns: ["client_id"];
-            isOneToOne: false;
-            referencedRelation: "clients";
-            referencedColumns: ["id"];
-          },
-        ];
+        Relationships: [];
       };
       clients: {
         Row: {

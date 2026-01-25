@@ -4,3 +4,5 @@ dist
 .turbo/
 
 supabase/
+
+.env
