@@ -15,6 +15,13 @@ import {
   Invite,
   GetClientUsersAndInvitesResponseDto,
 } from '@internal-cms/shared';
+import {
+  startOfMonth,
+  endOfMonth,
+  eachMonthOfInterval,
+  format,
+  isBefore,
+} from 'date-fns';
 
 @Injectable()
 export class ClientService {
@@ -47,6 +54,13 @@ export class ClientService {
         `Failed to create client: ${error.message}`,
       );
     }
+
+    // Create support months for the client
+    await this.manageSupportMonthsForClient(
+      client.id,
+      client.support_renewal_date,
+      client.hours_per_month,
+    );
 
     return client;
   }
@@ -105,6 +119,15 @@ export class ClientService {
     if (error) {
       throw new BadRequestException(
         `Failed to update client: ${error.message}`,
+      );
+    }
+
+    // Manage support months if renewal date was added or changed
+    if (updateClientDto.support_renewal_date !== undefined) {
+      await this.manageSupportMonthsForClient(
+        client.id,
+        client.support_renewal_date,
+        client.hours_per_month,
       );
     }
 
@@ -261,5 +284,109 @@ export class ClientService {
     }
 
     return supportMonths || [];
+  }
+
+  private async manageSupportMonthsForClient(
+    clientId: string,
+    supportRenewalDate: string | null,
+    hoursPerMonth: number | null,
+  ): Promise<void> {
+    const startDate = startOfMonth(new Date());
+
+    // If no renewal date, delete all future support months
+    if (!supportRenewalDate) {
+      const { error } = await this.supabase
+        .from('client_support_months')
+        .delete()
+        .eq('client_id', clientId)
+        .gte('date', format(startDate, 'yyyy-MM-dd'));
+
+      if (error) {
+        throw new BadRequestException(
+          `Failed to delete support months: ${error.message}`,
+        );
+      }
+      return;
+    }
+
+    const renewalDate = new Date(supportRenewalDate);
+    const endDate = endOfMonth(renewalDate);
+
+    // If renewal date is in the past, delete all future months
+    if (isBefore(endDate, startDate)) {
+      const { error } = await this.supabase
+        .from('client_support_months')
+        .delete()
+        .eq('client_id', clientId)
+        .gte('date', format(startDate, 'yyyy-MM-dd'));
+
+      if (error) {
+        throw new BadRequestException(
+          `Failed to delete support months: ${error.message}`,
+        );
+      }
+      return;
+    }
+
+    // Calculate cutoff date (first day of month after renewal date)
+    const cutoffDate = format(
+      startOfMonth(new Date(endDate.getFullYear(), endDate.getMonth() + 1, 1)),
+      'yyyy-MM-dd',
+    );
+
+    // Delete any support months beyond the renewal date
+    const { error: deleteError } = await this.supabase
+      .from('client_support_months')
+      .delete()
+      .eq('client_id', clientId)
+      .gte('date', cutoffDate);
+
+    if (deleteError) {
+      throw new BadRequestException(
+        `Failed to delete support months: ${deleteError.message}`,
+      );
+    }
+
+    // Generate months from current month to renewal date
+    const months = eachMonthOfInterval({ start: startDate, end: endDate });
+
+    // Check which months already exist
+    const { data: existingMonths } = await this.supabase
+      .from('client_support_months')
+      .select('date')
+      .eq('client_id', clientId);
+
+    const existingDates = new Set(
+      existingMonths?.map((m) => m.date.substring(0, 7)) || [],
+    );
+
+    // Create support months for months that don't exist
+    const monthsToCreate = months
+      .filter((month) => {
+        const monthKey = format(month, 'yyyy-MM');
+        return !existingDates.has(monthKey);
+      })
+      .map((month) => {
+        return {
+          client_id: clientId,
+          date: format(startOfMonth(month), 'yyyy-MM-dd'),
+          rolled_over_from_last_month: 0,
+          rollover_hours: 0,
+          spent_support_hours: 0,
+          total_support_hours: hoursPerMonth || 0,
+        };
+      });
+
+    if (monthsToCreate.length > 0) {
+      const { error } = await this.supabase
+        .from('client_support_months')
+        .insert(monthsToCreate);
+
+      if (error) {
+        throw new BadRequestException(
+          `Failed to create support months: ${error.message}`,
+        );
+      }
+    }
   }
 }

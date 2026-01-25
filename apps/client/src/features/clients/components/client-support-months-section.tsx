@@ -38,47 +38,15 @@ export function ClientSupportMonthsSection({
     isError,
   } = useGetClientSupportMonths(client.id, year);
 
-  // Generate all months for the year
-  const allMonths = Array.from({ length: 12 }, (_, i) => {
-    const monthDate = new Date(year, i, 1);
-    const today = new Date();
-    const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    return {
-      date: monthDate.toISOString().split("T")[0].substring(0, 7), // YYYY-MM format
-      monthName: monthDate.toLocaleDateString("en-US", { month: "short" }),
-      isPast: monthDate < firstOfMonth,
-    };
-  });
-
-  // Create a map of existing support months (using YYYY-MM format)
-  const supportMonthsMap = new Map(
+  // Only use support months that exist; do not fill in placeholders
+  const chartData =
     supportMonths?.map((sm) => {
-      const monthKey = sm.date.substring(0, 7); // Extract YYYY-MM
-      return [monthKey, sm];
-    }) || []
-  );
-
-  // Fill in missing months with placeholder data
-  const chartData = allMonths.map((month) => {
-    const existing = supportMonthsMap.get(month.date);
-    if (existing) {
+      const monthDate = new Date(sm.date);
       return {
-        ...existing,
-        monthName: month.monthName,
+        ...sm,
+        monthName: monthDate.toLocaleDateString("en-US", { month: "short" }),
       };
-    }
-    // Placeholder for missing months
-    // For past months: total_support_hours = 0
-    // For current/future months: total_support_hours = hours_per_month
-    return {
-      date: `${month.date}-01`,
-      monthName: month.monthName,
-      rolled_over_from_last_month: 0,
-      rollover_hours: 0,
-      spent_support_hours: 0,
-      total_support_hours: month.isPast ? 0 : client.hours_per_month || 0,
-    };
-  });
+    }) ?? [];
 
   const chartDataConfig = {
     labels: chartData.map((d) => d.monthName),
