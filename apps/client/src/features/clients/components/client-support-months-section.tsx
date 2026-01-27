@@ -13,7 +13,7 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 ChartJS.register(
   CategoryScale,
@@ -26,10 +26,12 @@ ChartJS.register(
 
 type ClientSupportMonthsSectionProps = {
   client: Client;
+  onOpenManageHours?: () => void;
 };
 
 export function ClientSupportMonthsSection({
   client,
+  onOpenManageHours,
 }: ClientSupportMonthsSectionProps) {
   const [year, setYear] = useState(new Date().getFullYear());
   const {
@@ -110,6 +112,16 @@ export function ClientSupportMonthsSection({
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
+          {onOpenManageHours && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onOpenManageHours}
+              leadingIcon={<Plus className="w-4 h-4" />}
+            >
+              Manage Hours
+            </Button>
+          )}
         </div>
       </div>
       {isLoading ? (

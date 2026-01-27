@@ -7,9 +7,14 @@ import {
   Body,
   NotFoundException,
   Inject,
+  BadRequestException,
 } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { UserRole, AddSupportHoursDto } from '@internal-cms/shared';
+import {
+  UserRole,
+  ManageSupportHoursDto,
+  ManageSupportHoursAction,
+} from '@internal-cms/shared';
 import { AuthenticatedRequest } from '../../../types/authenticated-request.types';
 import {
   SupportMonthsService,
@@ -37,11 +42,12 @@ export class SupportMonthsController {
     return this.supportMonthsService.getSupportMonths(clientId, year);
   }
 
-  @Patch(':id')
-  async addSupportHours(
+  @Patch(':id/:action')
+  async manageSupportHours(
     @Param('clientId') clientId: string,
     @Param('id') id: string,
-    @Body() dto: AddSupportHoursDto,
+    @Param('action') action: ManageSupportHoursAction,
+    @Body() dto: ManageSupportHoursDto,
   ): Promise<SupportMonthRow> {
     const user = this.request.user;
 
@@ -49,10 +55,20 @@ export class SupportMonthsController {
       throw new NotFoundException();
     }
 
-    return await this.supportMonthsService.addSupportHours(
-      clientId,
-      id,
-      dto.hours,
-    );
+    if (action === 'add') {
+      return await this.supportMonthsService.addSupportHours(
+        clientId,
+        id,
+        dto.hours,
+      );
+    } else if (action === 'remove') {
+      return await this.supportMonthsService.removeSupportHours(
+        clientId,
+        id,
+        dto.hours,
+      );
+    }
+
+    throw new BadRequestException('Invalid action');
   }
 }

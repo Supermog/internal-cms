@@ -106,4 +106,68 @@ export class SupportMonthsService {
 
     return updated;
   }
+
+  async removeSupportHours(
+    clientId: string,
+    supportMonthId: string,
+    hours: number,
+  ): Promise<SupportMonthRow> {
+    const { data: row, error: fetchError } = await this.supabase
+      .from('client_support_months')
+      .select('*')
+      .eq('id', supportMonthId)
+      .eq('client_id', clientId)
+      .single();
+
+    if (fetchError || !row) {
+      throw new NotFoundException('Support month not found');
+    }
+
+    const currentSpent = row.spent_support_hours;
+    const currentRollover = row.rollover_hours ?? 0;
+
+    let spentSupportHours: number;
+    let rolloverHours: number;
+
+    // First, reduce from rollover hours if available
+    if (currentRollover > 0) {
+      if (hours <= currentRollover) {
+        // All hours can be removed from rollover
+        rolloverHours = currentRollover - hours;
+        spentSupportHours = currentSpent;
+      } else {
+        // Remove all rollover hours, then reduce from spent
+        const remainingHours = hours - currentRollover;
+        rolloverHours = 0;
+        spentSupportHours = currentSpent - remainingHours;
+      }
+    } else {
+      // No rollover hours, reduce from spent
+      spentSupportHours = currentSpent - hours;
+      rolloverHours = currentRollover;
+    }
+
+    if (spentSupportHours < 0) {
+      throw new BadRequestException('Spent support hours cannot be negative');
+    }
+
+    const { data: updated, error: updateError } = await this.supabase
+      .from('client_support_months')
+      .update({
+        spent_support_hours: spentSupportHours,
+        rollover_hours: rolloverHours,
+      })
+      .eq('id', supportMonthId)
+      .eq('client_id', clientId)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw new BadRequestException(
+        `Failed to remove support hours: ${updateError.message}`,
+      );
+    }
+
+    return updated;
+  }
 }
