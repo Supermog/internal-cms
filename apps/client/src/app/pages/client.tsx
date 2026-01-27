@@ -3,7 +3,6 @@ import { Badge, BadgeType } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
-import { Modal } from "@/components/ui/modal";
 import { useGetClient } from "@/features/clients/api/get-client";
 import { useGetClientUsers } from "@/features/clients/api/get-client-users";
 import { EditClientSheet } from "@/features/clients/components/edit-client.sheet";
@@ -22,9 +21,6 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { getClientUsersQueryKey } from "@/features/clients/api/get-client-users";
-import { ManageSupportHoursForm } from "@/features/clients/components/manage-support-hours.form";
-import { useGetClientSupportMonths } from "@/features/clients/api/get-client-support-months";
-import { SupportMonthSelector } from "@/features/clients/components/support-month-selector";
 
 function ClientDetail() {
   const { id = "" } = useParams<{ id: string }>();
@@ -46,38 +42,6 @@ function ClientDetail() {
     name: string;
     email: string;
   } | null>(null);
-  const [isManageHoursOpen, setIsManageHoursOpen] = useState(false);
-  const [selectedMonthId, setSelectedMonthId] = useState<string | null>(null);
-
-  // Get support months for the current year to show in modal
-  const currentYear = new Date().getFullYear();
-  const { data: supportMonths } = useGetClientSupportMonths(
-    id || "",
-    currentYear,
-  );
-
-  // Find current month for default selection
-  const currentMonth = supportMonths?.find((sm) => {
-    const monthDate = new Date(sm.date);
-    const now = new Date();
-    return (
-      monthDate.getMonth() === now.getMonth() &&
-      monthDate.getFullYear() === now.getFullYear()
-    );
-  });
-
-  const handleOpenManageHours = () => {
-    setIsManageHoursOpen(true);
-    // Set current month as default when opening
-    if (currentMonth) {
-      setSelectedMonthId(currentMonth.id);
-    }
-  };
-
-  const handleCloseManageHours = () => {
-    setIsManageHoursOpen(false);
-    setSelectedMonthId(null);
-  };
 
   const deleteUserMutation = useDeleteUser({
     onSuccess: async () => {
@@ -148,10 +112,7 @@ function ClientDetail() {
         <ClientSupportFeaturesSection client={client} />
       </div>
 
-      <ClientSupportMonthsSection
-        client={client}
-        onOpenManageHours={handleOpenManageHours}
-      />
+      <ClientSupportMonthsSection client={client} clientId={id!} />
 
       <ClientUsersSection
         clientId={id!}
@@ -232,41 +193,6 @@ function ClientDetail() {
           deleteUserMutation.isPending || deleteInviteMutation.isPending
         }
       />
-
-      {/* Manage Support Hours Modal */}
-      <Modal
-        open={isManageHoursOpen}
-        onOpenChange={(open) => {
-          if (open) {
-            handleOpenManageHours();
-          } else {
-            handleCloseManageHours();
-          }
-        }}
-        title="Manage Support Hours"
-        description="Select a month and add or remove support hours"
-        size="lg"
-      >
-        <div className="space-y-6">
-          {supportMonths && supportMonths.length > 0 && (
-            <SupportMonthSelector
-              months={supportMonths}
-              selectedMonthId={selectedMonthId}
-              onSelectMonth={setSelectedMonthId}
-            />
-          )}
-
-          {/* Form */}
-          {selectedMonthId && (
-            <ManageSupportHoursForm
-              clientId={id}
-              supportMonthId={selectedMonthId}
-              onSuccess={handleCloseManageHours}
-              onCancel={handleCloseManageHours}
-            />
-          )}
-        </div>
-      </Modal>
     </div>
   );
 }

@@ -14,6 +14,9 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Modal } from "@/components/ui/modal";
+import { ManageSupportHoursForm } from "./manage-support-hours.form";
+import { SupportMonthSelector } from "./support-month-selector";
 
 ChartJS.register(
   CategoryScale,
@@ -21,24 +24,27 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 type ClientSupportMonthsSectionProps = {
   client: Client;
-  onOpenManageHours?: () => void;
+  clientId: string;
 };
 
-export function ClientSupportMonthsSection({
+function ClientSupportMonthsSection({
   client,
-  onOpenManageHours,
+  clientId,
 }: ClientSupportMonthsSectionProps) {
   const [year, setYear] = useState(new Date().getFullYear());
   const {
     data: supportMonths,
     isLoading,
     isError,
-  } = useGetClientSupportMonths(client.id, year);
+  } = useGetClientSupportMonths(clientId, year);
+
+  const [isManageHoursOpen, setIsManageHoursOpen] = useState(false);
+  const [selectedMonthId, setSelectedMonthId] = useState<string | null>(null);
 
   // Only use support months that exist; do not fill in placeholders
   const chartData =
@@ -95,6 +101,34 @@ export function ClientSupportMonthsSection({
     },
   };
 
+  // Find current month for default selection
+  const currentMonth = supportMonths?.find((sm) => {
+    const monthDate = new Date(sm.date);
+    const now = new Date();
+
+    if (year !== now.getFullYear()) {
+      return true;
+    }
+
+    return (
+      monthDate.getMonth() === now.getMonth() &&
+      monthDate.getFullYear() === now.getFullYear()
+    );
+  });
+
+  const handleOpenManageHours = () => {
+    setIsManageHoursOpen(true);
+    // Set current month as default when opening
+    if (currentMonth) {
+      setSelectedMonthId(currentMonth.id);
+    }
+  };
+
+  const handleCloseManageHours = () => {
+    setIsManageHoursOpen(false);
+    setSelectedMonthId(null);
+  };
+
   return (
     <div className="bg-white border rounded-lg p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -104,24 +138,18 @@ export function ClientSupportMonthsSection({
             <ChevronLeft className="w-4 h-4" />
           </Button>
           <span className="text-sm font-medium w-20 text-center">{year}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setYear(year + 1)}
-            disabled={year >= new Date().getFullYear()}
-          >
+          <Button variant="outline" size="sm" onClick={() => setYear(year + 1)}>
             <ChevronRight className="w-4 h-4" />
           </Button>
-          {onOpenManageHours && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={onOpenManageHours}
-              leadingIcon={<Plus className="w-4 h-4" />}
-            >
-              Manage Hours
-            </Button>
-          )}
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleOpenManageHours}
+            leadingIcon={<Plus className="w-4 h-4" />}
+            disabled={supportMonths?.length === 0 || !supportMonths}
+          >
+            Manage Hours
+          </Button>
         </div>
       </div>
       {isLoading ? (
@@ -133,6 +161,42 @@ export function ClientSupportMonthsSection({
           <Bar data={chartDataConfig} options={options} />
         </div>
       )}
+      {/* Manage Support Hours Modal */}
+      <Modal
+        open={isManageHoursOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            handleOpenManageHours();
+          } else {
+            handleCloseManageHours();
+          }
+        }}
+        title="Manage Support Hours"
+        description="Select a month and add or remove support hours"
+        size="lg"
+      >
+        <div className="space-y-6">
+          {supportMonths && supportMonths.length > 0 && (
+            <SupportMonthSelector
+              months={supportMonths}
+              selectedMonthId={selectedMonthId}
+              onSelectMonth={setSelectedMonthId}
+            />
+          )}
+
+          {/* Form */}
+          {selectedMonthId && (
+            <ManageSupportHoursForm
+              clientId={client.id}
+              supportMonthId={selectedMonthId}
+              onSuccess={handleCloseManageHours}
+              onCancel={handleCloseManageHours}
+            />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
+
+export { ClientSupportMonthsSection };

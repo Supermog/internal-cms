@@ -21,6 +21,7 @@ export function SupportMonthSelector({
           const monthName = monthDate.toLocaleDateString("en-US", {
             month: "short",
           });
+          const year = monthDate.getFullYear();
           const isSelected = selectedMonthId === month.id;
           return (
             <Button
@@ -31,7 +32,10 @@ export function SupportMonthSelector({
               onClick={() => onSelectMonth(month.id)}
               className="flex flex-col items-center justify-center h-auto py-2"
             >
-              <span className="text-xs font-medium">{monthName}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-medium">{year}</span>
+                <span className="text-xs font-medium">{monthName}</span>
+              </div>
               <span className="text-xs opacity-70">
                 {month.spent_support_hours.toFixed(1)}h
               </span>
