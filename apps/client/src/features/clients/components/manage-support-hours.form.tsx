@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useManageSupportHours } from "@/features/clients/api/manage-support-hours";
 import { ManageSupportHoursAction } from "@internal-cms/shared";
 import { useQueryClient } from "@tanstack/react-query";
@@ -75,13 +77,30 @@ export function ManageSupportHoursForm({
             <FormItem>
               <FormLabel>Action</FormLabel>
               <FormControl>
-                <select
-                  {...field}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="flex gap-6"
                 >
-                  <option value="add">Add Hours</option>
-                  <option value="remove">Remove Hours</option>
-                </select>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="add" id="add" />
+                    <Label
+                      htmlFor="add"
+                      className="cursor-pointer font-normal text-sm"
+                    >
+                      Add Hours
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="remove" id="remove" />
+                    <Label
+                      htmlFor="remove"
+                      className="cursor-pointer font-normal text-sm"
+                    >
+                      Remove Hours
+                    </Label>
+                  </div>
+                </RadioGroup>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,9 +114,8 @@ export function ManageSupportHoursForm({
               <FormLabel>Hours</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
+                  inputMode="numeric"
+                  type="text"
                   placeholder="Enter hours"
                   {...field}
                 />
