@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -80,7 +81,7 @@ function Clients() {
           size="icon"
           onClick={() =>
             navigate(
-              generatePath(routePaths.clientDetail, { id: row.original.id })
+              generatePath(routePaths.clientDetail, { id: row.original.id }),
             )
           }
         >
@@ -92,15 +93,17 @@ function Clients() {
 
   return (
     <div className="space-y-4">
-      <PageTitle title="Clients" description="Client overview and status" />
-      <div className="flex justify-end">
-        <Button
-          leadingIcon={<Plus className="w-4 h-4" />}
-          onClick={() => setIsCreateOpen(true)}
-        >
-          Add Client
-        </Button>
-      </div>
+      <PageHeader>
+        <div className="flex flex-1 items-start justify-between">
+          <PageTitle title="Clients" description="Client overview and status" />
+          <Button
+            leadingIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsCreateOpen(true)}
+          >
+            Add Client
+          </Button>
+        </div>
+      </PageHeader>
       <div>
         <DataTable
           columns={columns}

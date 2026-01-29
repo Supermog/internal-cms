@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import supabase from "@/lib/supabase";
 
@@ -8,8 +9,12 @@ function Dashboard() {
 
   return (
     <div>
-      <h1>Dashboard</h1>
-      <Button onClick={logout}>Logout</Button>
+      <PageHeader>
+        <div className="flex flex-1 items-center justify-between">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <Button onClick={logout}>Logout</Button>
+        </div>
+      </PageHeader>
     </div>
   );
 }

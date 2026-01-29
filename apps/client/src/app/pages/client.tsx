@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { PageTitle } from "@/components/page-title";
 import { Badge, BadgeType } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -87,24 +88,26 @@ function ClientDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <PageTitle
-          title={client.name}
-          description={`Short name: ${client.short_name}`}
-        />
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            leadingIcon={<Pencil className="w-4 h-4" />}
-            onClick={() => setIsEditOpen(true)}
-          >
-            Edit
-          </Button>
-          <Badge variant="outline" type={statusType}>
-            {capitalize(client.support_status)}
-          </Badge>
+      <PageHeader>
+        <div className="flex items-start justify-between">
+          <PageTitle
+            title={client.name}
+            description={`Short name: ${client.short_name}`}
+          />
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              leadingIcon={<Pencil className="w-4 h-4" />}
+              onClick={() => setIsEditOpen(true)}
+            >
+              Edit
+            </Button>
+            <Badge variant="outline" type={statusType}>
+              {capitalize(client.support_status)}
+            </Badge>
+          </div>
         </div>
-      </div>
+      </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ClientContactSection client={client} />
