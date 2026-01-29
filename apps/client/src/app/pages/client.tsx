@@ -88,13 +88,15 @@ function ClientDetail() {
 
   return (
     <div className="space-y-6">
-      <PageHeader>
-        <div className="flex items-start justify-between">
+      <PageHeader
+        title={
           <PageTitle
             title={client.name}
             description={`Short name: ${client.short_name}`}
           />
-          <div className="flex items-center gap-3">
+        }
+        actions={
+          <>
             <Button
               variant="outline"
               leadingIcon={<Pencil className="w-4 h-4" />}
@@ -105,9 +107,9 @@ function ClientDetail() {
             <Badge variant="outline" type={statusType}>
               {capitalize(client.support_status)}
             </Badge>
-          </div>
-        </div>
-      </PageHeader>
+          </>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ClientContactSection client={client} />

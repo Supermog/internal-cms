@@ -93,17 +93,19 @@ function Clients() {
 
   return (
     <div className="space-y-4">
-      <PageHeader>
-        <div className="flex flex-1 items-start justify-between">
+      <PageHeader
+        title={
           <PageTitle title="Clients" description="Client overview and status" />
+        }
+        actions={
           <Button
             leadingIcon={<Plus className="w-4 h-4" />}
             onClick={() => setIsCreateOpen(true)}
           >
             Add Client
           </Button>
-        </div>
-      </PageHeader>
+        }
+      />
       <div>
         <DataTable
           columns={columns}

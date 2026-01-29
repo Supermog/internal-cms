@@ -9,12 +9,10 @@ function Dashboard() {
 
   return (
     <div>
-      <PageHeader>
-        <div className="flex flex-1 items-center justify-between">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button onClick={logout}>Logout</Button>
-        </div>
-      </PageHeader>
+      <PageHeader
+        title={<h1 className="text-2xl font-bold">Dashboard</h1>}
+        actions={<Button onClick={logout}>Logout</Button>}
+      />
     </div>
   );
 }
