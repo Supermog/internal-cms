@@ -91,7 +91,8 @@ export class CreateClientDto {
   @IsOptional()
   @IsString()
   @ValidateIf(
-    (o) => o.support_renewal_date !== undefined && o.support_renewal_date !== ""
+    (o) =>
+      o.support_renewal_date !== undefined && o.support_renewal_date !== "",
   )
   @IsNotPastDate()
   support_renewal_date?: string;
@@ -138,7 +139,8 @@ export class UpdateClientDto {
   @IsOptional()
   @IsString()
   @ValidateIf(
-    (o) => o.support_renewal_date !== undefined && o.support_renewal_date !== ""
+    (o) =>
+      o.support_renewal_date !== undefined && o.support_renewal_date !== "",
   )
   @IsNotPastDate()
   support_renewal_date?: string;
