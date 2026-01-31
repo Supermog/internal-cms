@@ -4,8 +4,9 @@ import { Client } from "@internal-cms/shared";
 import { ClientSupportMonthsSection } from "@/features/clients/support_hours/components/client-support-months-section";
 import { ClientUsersSection } from "@/features/clients/users/components/client-users-section";
 import { ClientTicketsSection } from "@/features/tickets/components/client-tickets-section";
-import { Users, Clock, Ticket } from "lucide-react";
+import { Users, Clock, Ticket, Eye, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ActionsDropdownItem } from "@/components/actions-dropdown";
 
 type TabId = "users" | "support-hours" | "tickets";
 
@@ -13,6 +14,27 @@ type ClientTabbedSectionProps = {
   client: Client;
   clientId: string;
 };
+
+const actionItems: ActionsDropdownItem[] = [
+  {
+    label: (
+      <div className="flex items-center gap-2">
+        <Eye className="w-4 h-4" />
+        <span>View</span>
+      </div>
+    ),
+    onClick: () => {},
+  },
+  {
+    label: (
+      <div className="flex items-center gap-2">
+        <Pencil className="w-4 h-4" />
+        <span>Edit</span>
+      </div>
+    ),
+    onClick: () => {},
+  },
+];
 
 export function ClientTabbedSection({
   client,
@@ -78,7 +100,11 @@ export function ClientTabbedSection({
           />
         )}
         {activeTab === "tickets" && (
-          <ClientTicketsSection clientId={clientId} embedded actionItems={[]} />
+          <ClientTicketsSection
+            clientId={clientId}
+            embedded
+            actionItems={actionItems}
+          />
         )}
       </div>
     </div>
