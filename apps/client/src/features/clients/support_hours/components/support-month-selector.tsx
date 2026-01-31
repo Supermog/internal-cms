@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { SupportMonth } from "@/features/clients/api/manage-support-hours";
+import { SupportMonth } from "@/features/clients/support_hours/api/manage-support-hours";
 
 type SupportMonthSelectorProps = {
   months: SupportMonth[];

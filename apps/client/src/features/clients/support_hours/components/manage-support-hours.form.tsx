@@ -13,10 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useManageSupportHours } from "@/features/clients/api/manage-support-hours";
+import { useManageSupportHours } from "@/features/clients/support_hours/api/manage-support-hours";
 import { ManageSupportHoursAction } from "@internal-cms/shared";
 import { useQueryClient } from "@tanstack/react-query";
-import { getClientSupportMonthsQueryKey } from "@/features/clients/api/get-client-support-months";
+import { getClientSupportMonthsQueryKey } from "@/features/clients/support_hours/api/get-client-support-months";
 
 const manageSupportHoursSchema = z.object({
   action: z.enum(["add", "remove"]),

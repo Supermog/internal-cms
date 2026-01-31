@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetClientSupportMonths } from "@/features/clients/api/get-client-support-months";
+import { useGetClientSupportMonths } from "@/features/clients/support_hours/api/get-client-support-months";
 import { Client } from "@internal-cms/shared";
 import {
   Chart as ChartJS,
