@@ -21,7 +21,7 @@ import {
   forgotPasswordSchema,
 } from "../types/forgot-password.schema";
 import { authService } from "@/features/auth/auth.service";
-import { routePaths } from "@/app/config/route-paths.config";
+import { commonRoutePaths } from "@/app/config/route-paths.config";
 
 export function ForgotPasswordForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -56,7 +56,7 @@ export function ForgotPasswordForm() {
           </AlertDescription>
         </Alert>
         <Button variant="link" className="w-full" asChild>
-          <Link to={routePaths.signIn}>Back to Sign In</Link>
+          <Link to={commonRoutePaths.signIn}>Back to Sign In</Link>
         </Button>
       </div>
     );
@@ -104,7 +104,7 @@ export function ForgotPasswordForm() {
 
         <div className="text-center">
           <Button variant="link" className="h-auto p-0 text-muted" asChild>
-            <Link to={routePaths.signIn}>Back to Sign In</Link>
+            <Link to={commonRoutePaths.signIn}>Back to Sign In</Link>
           </Button>
         </div>
       </form>

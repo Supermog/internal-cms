@@ -21,7 +21,7 @@ import {
   resetPasswordSchema,
 } from "../types/reset-password.schema";
 import { authService } from "@/features/auth/auth.service";
-import { routePaths } from "@/app/config/route-paths.config";
+import { commonRoutePaths } from "@/app/config/route-paths.config";
 
 export function ResetPasswordForm() {
   const [searchParams] = useSearchParams();
@@ -75,7 +75,7 @@ export function ResetPasswordForm() {
       await authService.resetPassword(values.password, token);
       setIsSuccess(true);
       setTimeout(() => {
-        navigate(routePaths.signIn);
+        navigate(commonRoutePaths.signIn);
       }, 2000);
     } catch (error: any) {
       console.error(error);
@@ -165,7 +165,7 @@ export function ResetPasswordForm() {
 
         <div className="text-center">
           <Button variant="link" className="h-auto p-0 text-muted" asChild>
-            <Link to={routePaths.signIn}>Back to Sign In</Link>
+            <Link to={commonRoutePaths.signIn}>Back to Sign In</Link>
           </Button>
         </div>
       </form>

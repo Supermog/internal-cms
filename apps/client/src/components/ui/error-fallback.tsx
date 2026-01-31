@@ -2,7 +2,7 @@ import * as React from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
-import { routePaths } from "@/app/config/route-paths.config";
+import { commonRoutePaths } from "@/app/config/route-paths.config";
 
 interface ErrorFallbackProps {
   className?: string;
@@ -29,7 +29,7 @@ const ErrorFallback = React.forwardRef<HTMLDivElement, ErrorFallbackProps>(
         window.location.reload();
       },
       onGoHome = () => {
-        window.location.href = routePaths.home;
+        window.location.href = commonRoutePaths.home;
       },
       variant = "default",
       ...props

@@ -1,4 +1,4 @@
-import { routePaths } from "@/app/config/route-paths.config";
+import { commonRoutePaths } from "@/app/config/route-paths.config";
 import * as React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../use-auth";
@@ -16,7 +16,7 @@ function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (!session) {
-    return <Navigate to={routePaths.signIn} />;
+    return <Navigate to={commonRoutePaths.signIn} />;
   }
 
   return <>{children}</>;

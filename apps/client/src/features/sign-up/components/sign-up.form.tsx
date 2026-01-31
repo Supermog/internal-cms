@@ -23,7 +23,7 @@ import {
   getInviteByCodeQueryKey,
   useGetInviteByCode,
 } from "@/features/invites/api/get-invite-by-code";
-import { routePaths } from "@/app/config/route-paths.config";
+import { commonRoutePaths } from "@/app/config/route-paths.config";
 import { AcceptInviteDto } from "@internal-cms/shared";
 
 export function SignUpForm() {
@@ -55,7 +55,7 @@ export function SignUpForm() {
   const acceptInviteMutation = useAcceptInvite({
     onSuccess: () => {
       // Redirect to sign-in page after successful signup
-      navigate(routePaths.signIn, {
+      navigate(commonRoutePaths.signIn, {
         replace: true,
         state: { message: "Account created successfully. Please sign in." },
       });

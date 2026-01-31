@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { SignInFormData, signInSchema } from "../types/sign-in.schema";
 import supabase from "@/lib/supabase";
-import { routePaths } from "@/app/config/route-paths.config";
+import { commonRoutePaths } from "@/app/config/route-paths.config";
 
 export function SignInForm() {
   const form = useForm<SignInFormData>({
@@ -82,7 +82,7 @@ export function SignInForm() {
 
         <div className="flex justify-between">
           <Button variant="link" className="h-auto p-0 text-muted" asChild>
-            <Link to={routePaths.forgotPassword}>Forgot Password?</Link>
+            <Link to={commonRoutePaths.forgotPassword}>Forgot Password?</Link>
           </Button>
         </div>
 
