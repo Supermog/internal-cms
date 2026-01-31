@@ -24,7 +24,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend,
+  Legend
 );
 
 type ClientSupportMonthsSectionProps = {
@@ -32,12 +32,15 @@ type ClientSupportMonthsSectionProps = {
   clientId: string;
   /** When true, omit outer card styling (for use inside a parent card). */
   embedded?: boolean;
+  /** When true, show the manage hours button. */
+  isShowManageHoursButton?: boolean;
 };
 
 function ClientSupportMonthsSection({
   client,
   clientId,
   embedded = false,
+  isShowManageHoursButton = true,
 }: ClientSupportMonthsSectionProps) {
   const [year, setYear] = useState(new Date().getFullYear());
   const {
@@ -148,15 +151,17 @@ function ClientSupportMonthsSection({
           <Button variant="outline" size="sm" onClick={() => setYear(year + 1)}>
             <ChevronRight className="w-4 h-4" />
           </Button>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleOpenManageHours}
-            leadingIcon={<Plus className="w-4 h-4" />}
-            disabled={supportMonths?.length === 0 || !supportMonths}
-          >
-            Manage Hours
-          </Button>
+          {isShowManageHoursButton && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleOpenManageHours}
+              leadingIcon={<Plus className="w-4 h-4" />}
+              disabled={supportMonths?.length === 0 || !supportMonths}
+            >
+              Manage Hours
+            </Button>
+          )}
         </div>
       </div>
       {isLoading ? (
@@ -169,39 +174,41 @@ function ClientSupportMonthsSection({
         </div>
       )}
       {/* Manage Support Hours Modal */}
-      <Modal
-        open={isManageHoursOpen}
-        onOpenChange={(open) => {
-          if (open) {
-            handleOpenManageHours();
-          } else {
-            handleCloseManageHours();
-          }
-        }}
-        title="Manage Support Hours"
-        description="Select a month and add or remove support hours"
-        size="lg"
-      >
-        <div className="space-y-6">
-          {supportMonths && supportMonths.length > 0 && (
-            <SupportMonthSelector
-              months={supportMonths}
-              selectedMonthId={selectedMonthId}
-              onSelectMonth={setSelectedMonthId}
-            />
-          )}
+      {isShowManageHoursButton && (
+        <Modal
+          open={isManageHoursOpen}
+          onOpenChange={(open) => {
+            if (open) {
+              handleOpenManageHours();
+            } else {
+              handleCloseManageHours();
+            }
+          }}
+          title="Manage Support Hours"
+          description="Select a month and add or remove support hours"
+          size="lg"
+        >
+          <div className="space-y-6">
+            {supportMonths && supportMonths.length > 0 && (
+              <SupportMonthSelector
+                months={supportMonths}
+                selectedMonthId={selectedMonthId}
+                onSelectMonth={setSelectedMonthId}
+              />
+            )}
 
-          {/* Form */}
-          {selectedMonthId && (
-            <ManageSupportHoursForm
-              clientId={client.id}
-              supportMonthId={selectedMonthId}
-              onSuccess={handleCloseManageHours}
-              onCancel={handleCloseManageHours}
-            />
-          )}
-        </div>
-      </Modal>
+            {/* Form */}
+            {selectedMonthId && (
+              <ManageSupportHoursForm
+                clientId={client.id}
+                supportMonthId={selectedMonthId}
+                onSuccess={handleCloseManageHours}
+                onCancel={handleCloseManageHours}
+              />
+            )}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

@@ -53,7 +53,11 @@ function ClientSupportHoursPage() {
           />
         }
       />
-      <ClientSupportMonthsSection client={client} clientId={clientId} />
+      <ClientSupportMonthsSection
+        isShowManageHoursButton={false}
+        client={client}
+        clientId={clientId}
+      />
     </div>
   );
 }
