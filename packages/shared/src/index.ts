@@ -12,3 +12,4 @@ export * from "./types/users/user.dto";
 export * from "./types/support-months/support-months.dto";
 export * from "./types/pagination/pagination";
 export * from "./types/error/error";
+export * from "./types/tickets/tickets.dto";

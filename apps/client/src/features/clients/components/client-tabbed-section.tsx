@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Client } from "@internal-cms/shared";
 import { ClientSupportMonthsSection } from "@/features/clients/support_hours/components/client-support-months-section";
 import { ClientUsersSection } from "@/features/clients/users/components/client-users-section";
-import { Users, Clock } from "lucide-react";
+import { ClientTicketsSection } from "@/features/tickets/components/client-tickets-section";
+import { Users, Clock, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type TabId = "users" | "support-hours";
+type TabId = "users" | "support-hours" | "tickets";
 
 type ClientTabbedSectionProps = {
   client: Client;
@@ -50,6 +51,20 @@ export function ClientTabbedSection({
           <Clock className="w-4 h-4" />
           Support Hours
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "gap-2",
+            activeTab === "tickets"
+              ? "bg-white shadow-sm border text-foreground hover:bg-white hover:shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+          onClick={() => setActiveTab("tickets")}
+        >
+          <Ticket className="w-4 h-4" />
+          Tickets
+        </Button>
       </div>
       <div className="rounded-b-lg border border-t-0 bg-white p-6">
         {activeTab === "users" && (
@@ -61,6 +76,9 @@ export function ClientTabbedSection({
             clientId={clientId}
             embedded
           />
+        )}
+        {activeTab === "tickets" && (
+          <ClientTicketsSection clientId={clientId} embedded />
         )}
       </div>
     </div>

@@ -197,9 +197,9 @@ export type Database = {
           description: string
           estimated_hours: number | null
           id: string
-          priority: string
+          priority: Database["public"]["Enums"]["ticket_priority"]
           reporter_id: string
-          status: string
+          status: Database["public"]["Enums"]["ticket_status"]
           title: string
         }
         Insert: {
@@ -209,9 +209,9 @@ export type Database = {
           description: string
           estimated_hours?: number | null
           id?: string
-          priority: string
+          priority?: Database["public"]["Enums"]["ticket_priority"]
           reporter_id: string
-          status: string
+          status?: Database["public"]["Enums"]["ticket_status"]
           title: string
         }
         Update: {
@@ -221,9 +221,9 @@ export type Database = {
           description?: string
           estimated_hours?: number | null
           id?: string
-          priority?: string
+          priority?: Database["public"]["Enums"]["ticket_priority"]
           reporter_id?: string
-          status?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
           title?: string
         }
         Relationships: [
@@ -295,6 +295,8 @@ export type Database = {
     Enums: {
       client_status: "HEALTHY" | "NEEDS_ATTENTION"
       client_support_level: "NONE" | "BASIC" | "PREMIUM"
+      ticket_priority: "LOW" | "MID" | "HIGH"
+      ticket_status: "TODO" | "IN_PROGRESS" | "DONE"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -424,6 +426,8 @@ export const Constants = {
     Enums: {
       client_status: ["HEALTHY", "NEEDS_ATTENTION"],
       client_support_level: ["NONE", "BASIC", "PREMIUM"],
+      ticket_priority: ["LOW", "MID", "HIGH"],
+      ticket_status: ["TODO", "IN_PROGRESS", "DONE"],
     },
   },
 } as const
