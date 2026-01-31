@@ -1,7 +1,7 @@
 import supabase from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import { AdminUser, ClientUser, DatabaseUser } from "@internal-cms/shared";
+import { ClientUser, DatabaseUser } from "@internal-cms/shared";
 import { axiosClient } from "@/lib/axios";
 import { authService } from "./auth.service";
 
@@ -29,6 +29,7 @@ function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [databaseUser, setDatabaseUser] = useState<DatabaseUser | null>(null);
   const [status, setStatus] = useState<QueryStatus>(QueryStatus.Idle);
+  const [isClientUser, setIsClientUser] = useState<boolean>(false);
 
   useEffect(() => {
     setStatus(QueryStatus.Loading);
@@ -43,6 +44,7 @@ function useAuth() {
             session.user.id
           );
           setDatabaseUser(database_user);
+          setIsClientUser(isClient(database_user));
           setStatus(database_user ? QueryStatus.Success : QueryStatus.Error);
         } else {
           // No session, clear user data
@@ -65,12 +67,9 @@ function useAuth() {
   // Utility properties
   const isAuthenticated = !!session?.user;
 
-  const isAdmin = (databaseUser: DatabaseUser): databaseUser is AdminUser =>
-    databaseUser?.role === UserRole.ADMIN;
-
-  const isClientUser = (
-    databaseUser: DatabaseUser
-  ): databaseUser is ClientUser => databaseUser?.role === UserRole.CLIENT;
+  function isClient(databaseUser: DatabaseUser): databaseUser is ClientUser {
+    return databaseUser?.role === UserRole.CLIENT;
+  }
 
   return {
     session,
@@ -81,7 +80,6 @@ function useAuth() {
     isSuccess,
     isError,
     isAuthenticated,
-    isAdmin,
     isClientUser,
   };
 }

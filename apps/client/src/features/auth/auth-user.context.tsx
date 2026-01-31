@@ -1,11 +1,13 @@
 import { createContext, useContext } from "react";
 import { useAuth } from "./use-auth";
 import { Session } from "@supabase/supabase-js";
+import type { DatabaseUser } from "@internal-cms/shared";
 import { LoadingScreen } from "@/components/ui/loading-screen";
 import { ErrorFallback } from "@/components/ui/error-fallback";
 
 type AuthUserContextType = {
   session: Session | null;
+  databaseUser: DatabaseUser | null;
 };
 
 const AuthUserContext = createContext<AuthUserContextType | undefined>(
@@ -29,7 +31,7 @@ export type AuthUserProviderProps = {
  * hook. `useAuth` is for data querying, while `useAuthUser` is for dependency injection.
  */
 function AuthUserProvider({ children }: AuthUserProviderProps) {
-  const { session, isLoading, isError } = useAuth();
+  const { session, databaseUser, isLoading, isError } = useAuth();
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -41,6 +43,7 @@ function AuthUserProvider({ children }: AuthUserProviderProps) {
 
   const contextValue = {
     session,
+    databaseUser,
   };
 
   return (

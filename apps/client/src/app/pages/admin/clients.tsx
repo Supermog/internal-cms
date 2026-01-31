@@ -11,7 +11,7 @@ import { Badge, BadgeType } from "@/components/ui/badge";
 import { useState } from "react";
 import { CreateClientSheet } from "@/features/clients/components/create-client.sheet";
 import { generatePath, useNavigate } from "react-router-dom";
-import { routePaths } from "../config/route-paths.config";
+import { routePaths } from "../../config/route-paths.config";
 
 function Clients() {
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ function Clients() {
           size="icon"
           onClick={() =>
             navigate(
-              generatePath(routePaths.clientDetail, { id: row.original.id }),
+              generatePath(routePaths.clientDetail, { id: row.original.id })
             )
           }
         >
