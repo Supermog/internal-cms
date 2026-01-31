@@ -7,7 +7,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { InviteModule } from './modules/invite/invite.module';
 import { ClientModule } from './modules/client/client.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AccessGuard } from './guards/access.guard';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
     AuthModule,
     InviteModule,
     ClientModule,
+    TicketsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -25,6 +28,10 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AccessGuard,
     },
   ],
 })
