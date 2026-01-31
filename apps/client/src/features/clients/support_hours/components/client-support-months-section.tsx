@@ -30,11 +30,14 @@ ChartJS.register(
 type ClientSupportMonthsSectionProps = {
   client: Client;
   clientId: string;
+  /** When true, omit outer card styling (for use inside a parent card). */
+  embedded?: boolean;
 };
 
 function ClientSupportMonthsSection({
   client,
   clientId,
+  embedded = false,
 }: ClientSupportMonthsSectionProps) {
   const [year, setYear] = useState(new Date().getFullYear());
   const {
@@ -130,7 +133,11 @@ function ClientSupportMonthsSection({
   };
 
   return (
-    <div className="bg-white border rounded-lg p-6 space-y-4">
+    <div
+      className={
+        embedded ? "space-y-4" : "bg-white border rounded-lg p-6 space-y-4"
+      }
+    >
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Support Months</h2>
         <div className="flex items-center gap-2">

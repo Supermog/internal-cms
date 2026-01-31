@@ -1,53 +1,96 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 import { Mail, Pencil, Plus, Trash2, User, Users } from "lucide-react";
 import {
-  GetClientUsersAndInvitesResponseDto,
+  Client,
   Invite,
   DatabaseUser,
 } from "@internal-cms/shared";
 import { capitalize } from "lodash-es";
+import { useGetClientUsers } from "@/features/clients/users/api/get-client-users";
+import { useDeleteUser } from "@/features/users/api/delete-user";
+import { useDeleteInvite } from "@/features/invites/api/delete-invite";
+import { useQueryClient } from "@tanstack/react-query";
+import { getClientUsersQueryKey } from "@/features/clients/users/api/get-client-users";
+import { AddUserSheet } from "./add-user.sheet";
+import { EditInviteSheet } from "./edit-invite.sheet";
 
 type ClientUsersSectionProps = {
+  client: Client;
   clientId: string;
-  usersAndInvites?: GetClientUsersAndInvitesResponseDto;
-  isLoading: boolean;
-  isError: boolean;
-  onAddUser: () => void;
-  onEditInvite: (inviteId: string) => void;
-  onDeleteUser: (user: { id: string; name: string; email: string }) => void;
-  onDeleteInvite: (invite: { id: string; name: string; email: string }) => void;
+  /** When true, omit outer card styling (for use inside a parent card). */
+  embedded?: boolean;
 };
 
 export function ClientUsersSection({
-  usersAndInvites,
-  isLoading,
-  isError,
-  onAddUser,
-  onEditInvite,
-  onDeleteUser,
-  onDeleteInvite,
+  client,
+  clientId,
+  embedded = false,
 }: ClientUsersSectionProps) {
+  const {
+    data: usersAndInvites,
+    isLoading,
+    isError,
+  } = useGetClientUsers(clientId);
+  const queryClient = useQueryClient();
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [editingInviteId, setEditingInviteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<{
+    type: "user" | "invite";
+    id: string;
+    name: string;
+    email: string;
+  } | null>(null);
+
+  const deleteUserMutation = useDeleteUser({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getClientUsersQueryKey(clientId),
+      });
+      setDeleting(null);
+    },
+  });
+
+  const deleteInviteMutation = useDeleteInvite({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getClientUsersQueryKey(clientId),
+      });
+      setDeleting(null);
+    },
+  });
+
+  const editingInvite = editingInviteId
+    ? usersAndInvites?.invites.find((i) => i.id === editingInviteId)
+    : undefined;
+
   const pendingInvitations = usersAndInvites?.invites?.filter(
     (invite) => invite.status === "pending"
   );
 
   return (
-    <div className="bg-white border rounded-lg p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Users className="w-5 h-5" />
-          Users
-        </h2>
-        <Button
-          variant="outline"
-          leadingIcon={<Plus className="w-4 h-4" />}
-          onClick={onAddUser}
-        >
-          Add User
-        </Button>
-      </div>
+    <>
+      <div
+        className={
+          embedded ? "space-y-4" : "bg-white border rounded-lg p-6 space-y-4"
+        }
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Users
+          </h2>
+          <Button
+            variant="outline"
+            leadingIcon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsAddUserOpen(true)}
+          >
+            Add User
+          </Button>
+        </div>
       {isLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-12 w-full" />
@@ -68,7 +111,8 @@ export function ClientUsersSection({
                     key={user.id}
                     user={user}
                     onDelete={() =>
-                      onDeleteUser({
+                      setDeleting({
+                        type: "user",
                         id: user.id,
                         name: user.name,
                         email: user.email,
@@ -89,9 +133,10 @@ export function ClientUsersSection({
                   <InviteRow
                     key={invite.id}
                     invite={invite}
-                    onEdit={() => onEditInvite(invite.id)}
+                    onEdit={() => setEditingInviteId(invite.id)}
                     onDelete={() =>
-                      onDeleteInvite({
+                      setDeleting({
+                        type: "invite",
                         id: invite.id,
                         name: invite.name,
                         email: invite.email,
@@ -115,6 +160,41 @@ export function ClientUsersSection({
         <p className="text-gray-500 text-sm">No users found for this client.</p>
       )}
     </div>
+
+      <AddUserSheet
+        client={client}
+        open={isAddUserOpen}
+        onOpenChange={setIsAddUserOpen}
+      />
+      <EditInviteSheet
+        client={client}
+        invite={editingInvite}
+        open={!!editingInviteId}
+        onOpenChange={(open) => {
+          if (!open) setEditingInviteId(null);
+        }}
+      />
+      <DeleteConfirmationDialog
+        open={!!deleting}
+        onOpenChange={(open) => {
+          if (!open) setDeleting(null);
+        }}
+        title={`Delete ${deleting?.type === "user" ? "User" : "Invitation"}`}
+        description={`Are you sure you want to delete ${deleting?.name} (${deleting?.email})? This action cannot be undone.`}
+        onConfirm={() => {
+          if (deleting) {
+            if (deleting.type === "user") {
+              deleteUserMutation.mutate(deleting.id);
+            } else {
+              deleteInviteMutation.mutate(deleting.id);
+            }
+          }
+        }}
+        isLoading={
+          deleteUserMutation.isPending || deleteInviteMutation.isPending
+        }
+      />
+    </>
   );
 }
 
