@@ -32,7 +32,7 @@ function ClientTicketsPage() {
           />
         }
       />
-      <ClientTicketsSection clientId={clientId} />
+      <ClientTicketsSection clientId={clientId} actionItems={[]} />
     </div>
   );
 }

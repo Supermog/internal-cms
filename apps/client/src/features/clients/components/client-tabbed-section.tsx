@@ -78,7 +78,7 @@ export function ClientTabbedSection({
           />
         )}
         {activeTab === "tickets" && (
-          <ClientTicketsSection clientId={clientId} embedded />
+          <ClientTicketsSection clientId={clientId} embedded actionItems={[]} />
         )}
       </div>
     </div>
