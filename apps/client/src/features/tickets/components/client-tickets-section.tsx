@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import type { BadgeType } from "@/components/ui/badge";
 import { useGetClientTickets } from "@/features/tickets/api/get-client-tickets";
 import type { TicketRow } from "@/features/tickets/api/get-client-tickets";
-import { Ticket } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { TicketPriority, TicketStatus } from "@internal-cms/shared";
@@ -15,8 +14,6 @@ type ClientTicketsSectionProps = {
   clientId: string;
   /** When true, omit outer card styling (for use inside a parent card). */
   embedded?: boolean;
-  /** When true, show the title. */
-  isShowTitle?: boolean;
 };
 
 function statusToBadgeType(status: TicketStatus): BadgeType {
@@ -101,7 +98,6 @@ const columns: ColumnDef<TicketRow, unknown>[] = [
 export function ClientTicketsSection({
   clientId,
   embedded = false,
-  isShowTitle = true,
 }: ClientTicketsSectionProps) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -132,15 +128,6 @@ export function ClientTicketsSection({
         embedded ? "space-y-4" : "bg-white border rounded-lg p-6 space-y-4"
       )}
     >
-      {isShowTitle && (
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Ticket className="w-5 h-5" />
-            Tickets
-          </h2>
-        </div>
-      )}
-
       <DataTable
         key={clientId}
         columns={columns}

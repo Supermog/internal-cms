@@ -3,12 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
-import { Mail, Pencil, Plus, Trash2, User, Users } from "lucide-react";
-import {
-  Client,
-  Invite,
-  DatabaseUser,
-} from "@internal-cms/shared";
+import { Mail, Pencil, Plus, Trash2, User } from "lucide-react";
+import { Client, Invite, DatabaseUser } from "@internal-cms/shared";
 import { capitalize } from "lodash-es";
 import { useGetClientUsers } from "@/features/clients/users/api/get-client-users";
 import { useDeleteUser } from "@/features/users/api/delete-user";
@@ -78,11 +74,7 @@ export function ClientUsersSection({
           embedded ? "space-y-4" : "bg-white border rounded-lg p-6 space-y-4"
         }
       >
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Users
-          </h2>
+        <div className="flex items-center justify-start">
           <Button
             variant="outline"
             leadingIcon={<Plus className="w-4 h-4" />}
@@ -91,75 +83,77 @@ export function ClientUsersSection({
             Add User
           </Button>
         </div>
-      {isLoading ? (
-        <div className="space-y-3">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-        </div>
-      ) : isError ? (
-        <p className="text-gray-500 text-sm">Failed to load users.</p>
-      ) : usersAndInvites ? (
-        <>
-          {usersAndInvites.users && usersAndInvites.users.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700">
-                Active Users
-              </h3>
-              <div className="divide-y">
-                {usersAndInvites.users.map((user) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    onDelete={() =>
-                      setDeleting({
-                        type: "user",
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                      })
-                    }
-                  />
-                ))}
+        {isLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        ) : isError ? (
+          <p className="text-gray-500 text-sm">Failed to load users.</p>
+        ) : usersAndInvites ? (
+          <>
+            {usersAndInvites.users && usersAndInvites.users.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Active Users
+                </h3>
+                <div className="divide-y">
+                  {usersAndInvites.users.map((user) => (
+                    <UserRow
+                      key={user.id}
+                      user={user}
+                      onDelete={() =>
+                        setDeleting({
+                          type: "user",
+                          id: user.id,
+                          name: user.name,
+                          email: user.email,
+                        })
+                      }
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          {pendingInvitations && pendingInvitations.length > 0 && (
-            <div className="space-y-4 mt-6">
-              <h3 className="text-sm font-medium text-gray-700">
-                Pending Invitations
-              </h3>
-              <div className="divide-y">
-                {pendingInvitations.map((invite) => (
-                  <InviteRow
-                    key={invite.id}
-                    invite={invite}
-                    onEdit={() => setEditingInviteId(invite.id)}
-                    onDelete={() =>
-                      setDeleting({
-                        type: "invite",
-                        id: invite.id,
-                        name: invite.name,
-                        email: invite.email,
-                      })
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          {(!usersAndInvites.users || usersAndInvites.users.length === 0) &&
-            (!usersAndInvites.invites ||
-              usersAndInvites.invites.filter((i) => i.status === "pending")
-                .length === 0) && (
-              <p className="text-gray-500 text-sm">
-                No users or pending invitations found for this client.
-              </p>
             )}
-        </>
-      ) : (
-        <p className="text-gray-500 text-sm">No users found for this client.</p>
-      )}
-    </div>
+            {pendingInvitations && pendingInvitations.length > 0 && (
+              <div className="space-y-4 mt-6">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Pending Invitations
+                </h3>
+                <div className="divide-y">
+                  {pendingInvitations.map((invite) => (
+                    <InviteRow
+                      key={invite.id}
+                      invite={invite}
+                      onEdit={() => setEditingInviteId(invite.id)}
+                      onDelete={() =>
+                        setDeleting({
+                          type: "invite",
+                          id: invite.id,
+                          name: invite.name,
+                          email: invite.email,
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {(!usersAndInvites.users || usersAndInvites.users.length === 0) &&
+              (!usersAndInvites.invites ||
+                usersAndInvites.invites.filter((i) => i.status === "pending")
+                  .length === 0) && (
+                <p className="text-gray-500 text-sm">
+                  No users or pending invitations found for this client.
+                </p>
+              )}
+          </>
+        ) : (
+          <p className="text-gray-500 text-sm">
+            No users found for this client.
+          </p>
+        )}
+      </div>
 
       <AddUserSheet
         client={client}

@@ -141,8 +141,7 @@ function ClientSupportMonthsSection({
         embedded ? "space-y-4" : "bg-white border rounded-lg p-6 space-y-4"
       }
     >
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Support Months</h2>
+      <div className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setYear(year - 1)}>
             <ChevronLeft className="w-4 h-4" />
@@ -151,18 +150,18 @@ function ClientSupportMonthsSection({
           <Button variant="outline" size="sm" onClick={() => setYear(year + 1)}>
             <ChevronRight className="w-4 h-4" />
           </Button>
-          {isShowManageHoursButton && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleOpenManageHours}
-              leadingIcon={<Plus className="w-4 h-4" />}
-              disabled={supportMonths?.length === 0 || !supportMonths}
-            >
-              Manage Hours
-            </Button>
-          )}
         </div>
+        {isShowManageHoursButton && (
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleOpenManageHours}
+            leadingIcon={<Plus className="w-4 h-4" />}
+            disabled={supportMonths?.length === 0 || !supportMonths}
+          >
+            Manage Hours
+          </Button>
+        )}
       </div>
       {isLoading ? (
         <Skeleton className="h-64 w-full" />

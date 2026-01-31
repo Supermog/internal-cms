@@ -32,7 +32,7 @@ function ClientTicketsPage() {
           />
         }
       />
-      <ClientTicketsSection clientId={clientId} isShowTitle={false} />
+      <ClientTicketsSection clientId={clientId} />
     </div>
   );
 }
