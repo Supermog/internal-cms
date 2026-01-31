@@ -6,18 +6,18 @@ import { ClientUsersSection } from "@/features/clients/users/components/client-u
 import { Users, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type View = "users" | "support-hours";
+type TabId = "users" | "support-hours";
 
-type ClientUsersAndSupportSectionProps = {
+type ClientTabbedSectionProps = {
   client: Client;
   clientId: string;
 };
 
-export function ClientUsersAndSupportSection({
+export function ClientTabbedSection({
   client,
   clientId,
-}: ClientUsersAndSupportSectionProps) {
-  const [activeView, setActiveView] = useState<View>("users");
+}: ClientTabbedSectionProps) {
+  const [activeTab, setActiveTab] = useState<TabId>("users");
 
   return (
     <div className="space-y-0">
@@ -27,11 +27,11 @@ export function ClientUsersAndSupportSection({
           size="sm"
           className={cn(
             "gap-2",
-            activeView === "users"
+            activeTab === "users"
               ? "bg-white shadow-sm border text-foreground"
               : "text-muted-foreground hover:text-foreground"
           )}
-          onClick={() => setActiveView("users")}
+          onClick={() => setActiveTab("users")}
         >
           <Users className="w-4 h-4" />
           Users
@@ -41,21 +41,21 @@ export function ClientUsersAndSupportSection({
           size="sm"
           className={cn(
             "gap-2",
-            activeView === "support-hours"
+            activeTab === "support-hours"
               ? "bg-white shadow-sm border text-foreground"
               : "text-muted-foreground hover:text-foreground"
           )}
-          onClick={() => setActiveView("support-hours")}
+          onClick={() => setActiveTab("support-hours")}
         >
           <Clock className="w-4 h-4" />
           Support Hours
         </Button>
       </div>
       <div className="rounded-b-lg border border-t-0 bg-white p-6">
-        {activeView === "users" && (
+        {activeTab === "users" && (
           <ClientUsersSection client={client} clientId={clientId} embedded />
         )}
-        {activeView === "support-hours" && (
+        {activeTab === "support-hours" && (
           <ClientSupportMonthsSection
             client={client}
             clientId={clientId}

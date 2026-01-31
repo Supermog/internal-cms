@@ -8,7 +8,7 @@ import { EditClientSheet } from "@/features/clients/components/edit-client.sheet
 import { ClientContactSection } from "@/features/clients/components/client-contact-section";
 import { ClientSupportDetailsSection } from "@/features/clients/components/client-support-details-section";
 import { ClientSupportFeaturesSection } from "@/features/clients/components/client-support-features-section";
-import { ClientUsersAndSupportSection } from "@/features/clients/components/client-users-and-support-section";
+import { ClientTabbedSection } from "@/features/clients/components/client-tabbed-section";
 import { capitalize } from "lodash-es";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
@@ -74,7 +74,7 @@ function ClientDetail() {
         <ClientSupportFeaturesSection client={client} />
       </div>
 
-      <ClientUsersAndSupportSection client={client} clientId={id!} />
+      <ClientTabbedSection client={client} clientId={id!} />
 
       <EditClientSheet
         client={client}
