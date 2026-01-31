@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 import { useGetClient } from "@/features/clients/api/get-client";
-import { useGetClientUsers } from "@/features/clients/api/get-client-users";
+import { useGetClientUsers } from "@/features/clients/users/api/get-client-users";
 import { EditClientSheet } from "@/features/clients/components/edit-client.sheet";
-import { AddUserSheet } from "@/features/clients/components/add-user.sheet";
-import { EditInviteSheet } from "@/features/clients/components/edit-invite.sheet";
+import { AddUserSheet } from "@/features/clients/users/components/add-user.sheet";
+import { EditInviteSheet } from "@/features/clients/users/components/edit-invite.sheet";
 import { ClientContactSection } from "@/features/clients/components/client-contact-section";
 import { ClientSupportDetailsSection } from "@/features/clients/components/client-support-details-section";
 import { ClientSupportFeaturesSection } from "@/features/clients/components/client-support-features-section";
 import { ClientSupportMonthsSection } from "@/features/clients/support_hours/components/client-support-months-section";
-import { ClientUsersSection } from "@/features/clients/components/client-users-section";
+import { ClientUsersSection } from "@/features/clients/users/components/client-users-section";
 import { useDeleteInvite } from "@/features/invites/api/delete-invite";
 import { useDeleteUser } from "@/features/users/api/delete-user";
 import { capitalize } from "lodash-es";
@@ -21,7 +21,7 @@ import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { getClientUsersQueryKey } from "@/features/clients/api/get-client-users";
+import { getClientUsersQueryKey } from "@/features/clients/users/api/get-client-users";
 
 function ClientDetail() {
   const { id = "" } = useParams<{ id: string }>();

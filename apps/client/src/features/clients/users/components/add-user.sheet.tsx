@@ -21,7 +21,7 @@ import {
 import { useCreateInvite } from "@/features/invites/api/create-invite";
 import { CreateInviteDto, UserRole, Client } from "@internal-cms/shared";
 import { useQueryClient } from "@tanstack/react-query";
-import { getClientUsersQueryKey } from "@/features/clients/api/get-client-users";
+import { getClientUsersQueryKey } from "@/features/clients/users/api/get-client-users";
 
 const addUserSchema = z.object({
   name: z.string().min(1, "Required"),

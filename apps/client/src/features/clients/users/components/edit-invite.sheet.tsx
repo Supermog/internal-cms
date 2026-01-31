@@ -22,7 +22,7 @@ import {
 import { useUpdateInvite } from "@/features/invites/api/update-invite";
 import { Invite, Client } from "@internal-cms/shared";
 import { useQueryClient } from "@tanstack/react-query";
-import { getClientUsersQueryKey } from "@/features/clients/api/get-client-users";
+import { getClientUsersQueryKey } from "@/features/clients/users/api/get-client-users";
 
 const editInviteSchema = z.object({
   name: z.string().min(1, "Required"),
