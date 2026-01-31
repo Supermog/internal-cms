@@ -8,6 +8,7 @@ import { ErrorFallback } from "@/components/ui/error-fallback";
 type AuthUserContextType = {
   session: Session | null;
   databaseUser: DatabaseUser | null;
+  isClientUser: boolean;
 };
 
 const AuthUserContext = createContext<AuthUserContextType | undefined>(
@@ -31,7 +32,7 @@ export type AuthUserProviderProps = {
  * hook. `useAuth` is for data querying, while `useAuthUser` is for dependency injection.
  */
 function AuthUserProvider({ children }: AuthUserProviderProps) {
-  const { session, databaseUser, isLoading, isError } = useAuth();
+  const { session, databaseUser, isLoading, isError, isClient } = useAuth();
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -41,9 +42,13 @@ function AuthUserProvider({ children }: AuthUserProviderProps) {
     return <ErrorFallback variant="fullscreen" />;
   }
 
-  const contextValue = {
+  const contextValue: AuthUserContextType = {
     session,
     databaseUser,
+    /**
+     * After isLoading and isError checks we can safely assume that databaseUser is not null
+     */
+    isClientUser: isClient(databaseUser!),
   };
 
   return (

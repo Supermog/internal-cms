@@ -29,7 +29,6 @@ function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [databaseUser, setDatabaseUser] = useState<DatabaseUser | null>(null);
   const [status, setStatus] = useState<QueryStatus>(QueryStatus.Idle);
-  const [isClientUser, setIsClientUser] = useState<boolean>(false);
 
   useEffect(() => {
     setStatus(QueryStatus.Loading);
@@ -44,7 +43,6 @@ function useAuth() {
             session.user.id
           );
           setDatabaseUser(database_user);
-          setIsClientUser(isClient(database_user));
           setStatus(database_user ? QueryStatus.Success : QueryStatus.Error);
         } else {
           // No session, clear user data
@@ -80,7 +78,7 @@ function useAuth() {
     isSuccess,
     isError,
     isAuthenticated,
-    isClientUser,
+    isClient,
   };
 }
 
