@@ -28,7 +28,7 @@ export function ClientTabbedSection({
           className={cn(
             "gap-2",
             activeTab === "users"
-              ? "bg-white shadow-sm border text-foreground"
+              ? "bg-white shadow-sm border text-foreground hover:bg-white hover:shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           )}
           onClick={() => setActiveTab("users")}
@@ -42,7 +42,7 @@ export function ClientTabbedSection({
           className={cn(
             "gap-2",
             activeTab === "support-hours"
-              ? "bg-white shadow-sm border text-foreground"
+              ? "bg-white shadow-sm border text-foreground hover:bg-white hover:shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           )}
           onClick={() => setActiveTab("support-hours")}
