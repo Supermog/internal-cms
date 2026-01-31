@@ -1,5 +1,5 @@
 import { NavigationItem } from "@/features/navigation/types/navigation";
-import { Building, Clock, Home, Users } from "lucide-react";
+import { Building, Clock, Home, Ticket, Users } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/features/navigation/components/app-sidebar";
 import { Content } from "@/features/navigation/components/content";
@@ -18,6 +18,7 @@ const clientNavigation: NavigationItem[] = [
   { name: "Overview", href: "/", icon: Home },
   { name: "Users", href: "/users", icon: Users },
   { name: "Support Hours", href: "/support-hours", icon: Clock },
+  { name: "Tickets", href: "/tickets", icon: Ticket },
 ];
 
 const bottomNavigation: NavigationItem[] = [];

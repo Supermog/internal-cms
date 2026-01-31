@@ -16,4 +16,5 @@ export const clientRoutePaths = Object.freeze({
   ...commonRoutePaths,
   clientUsers: "/users",
   clientSupportHours: "/support-hours",
+  clientTickets: "/tickets",
 });

@@ -19,6 +19,7 @@ import { ClientDetail } from "./pages/admin/client";
 import { ClientDashboard } from "./pages/client/dashboard";
 import { ClientUsersPage } from "./pages/client/users";
 import { ClientSupportHoursPage } from "./pages/client/support-hours";
+import { ClientTicketsPage } from "./pages/client/tickets";
 
 const commonRoutes = [
   {
@@ -67,6 +68,10 @@ const clientRouter = createBrowserRouter(
         {
           path: clientRoutePaths.clientSupportHours,
           element: <ClientSupportHoursPage />,
+        },
+        {
+          path: clientRoutePaths.clientTickets,
+          element: <ClientTicketsPage />,
         },
       ],
     },
