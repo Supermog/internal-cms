@@ -10,16 +10,16 @@ import { SignUp } from "./pages/auth/sign-up";
 import { ForgotPassword } from "./pages/auth/forgot-password";
 import { ResetPassword } from "./pages/auth/reset-password";
 import { AuthLayout } from "./layouts/auth.layout";
-import { GuestGuard } from "@/features/auth/guards/guest-guard";
-import { Dashboard } from "./pages/admin/dashboard";
-import { AuthGuard } from "@/features/auth/guards/auth-guard";
+import { GuestGuard } from "@/admin/features/auth/guards/guest-guard";
+import { Dashboard } from "../admin/pages/dashboard";
+import { AuthGuard } from "@/admin/features/auth/guards/auth-guard";
 import { MainLayout } from "./layouts/main.layout";
-import { Clients } from "./pages/admin/clients";
-import { ClientDetail } from "./pages/admin/client";
-import { ClientDashboard } from "./pages/client/dashboard";
-import { ClientUsersPage } from "./pages/client/users";
-import { ClientSupportHoursPage } from "./pages/client/support-hours";
-import { ClientTicketsPage } from "./pages/client/tickets";
+import { Clients } from "../admin/pages/clients";
+import { ClientDetail } from "../admin/pages/client";
+import { ClientDashboard } from "../client/pages/dashboard";
+import { ClientUsersPage } from "../client/pages/users";
+import { ClientSupportHoursPage } from "../client/pages/support-hours";
+import { ClientTicketsPage } from "../client/pages/tickets";
 
 const commonRoutes = [
   {
@@ -55,7 +55,7 @@ const adminRouter = createBrowserRouter(
     future: {
       v7_relativeSplatPath: true,
     },
-  }
+  },
 );
 
 const clientRouter = createBrowserRouter(
@@ -81,7 +81,7 @@ const clientRouter = createBrowserRouter(
     future: {
       v7_relativeSplatPath: true,
     },
-  }
+  },
 );
 
 export { adminRouter, clientRouter };

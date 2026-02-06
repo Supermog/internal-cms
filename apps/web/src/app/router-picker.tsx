@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router-dom";
 import { adminRouter, clientRouter } from "./router";
-import { useAuthUser } from "@/features/auth/auth-user.context";
+import { useAuthUser } from "@/admin/features/auth/auth-user.context";
 
 function RouterPicker() {
   const { isClientUser } = useAuthUser();

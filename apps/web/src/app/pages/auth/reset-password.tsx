@@ -1,4 +1,4 @@
-import { ResetPasswordForm } from "@/features/reset-password/components/reset-password.form";
+import { ResetPasswordForm } from "@/admin/features/reset-password/components/reset-password.form";
 import { Helmet } from "react-helmet-async";
 
 function ResetPassword() {

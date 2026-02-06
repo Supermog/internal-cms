@@ -1,9 +1,9 @@
-import { NavigationItem } from "@/features/navigation/types/navigation";
+import { NavigationItem } from "@/admin/features/navigation/types/navigation";
 import { Building, Clock, Home, Ticket, Users } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/features/navigation/components/app-sidebar";
-import { Content } from "@/features/navigation/components/content";
-import { useAuthUser } from "@/features/auth/auth-user.context";
+import { AppSidebar } from "@/admin/features/navigation/components/app-sidebar";
+import { Content } from "@/admin/features/navigation/components/content";
+import { useAuthUser } from "@/admin/features/auth/auth-user.context";
 
 type MainLayoutProps = {
   children?: React.ReactNode;

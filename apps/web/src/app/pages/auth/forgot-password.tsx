@@ -1,4 +1,4 @@
-import { ForgotPasswordForm } from "@/features/forgot-password/components/forgot-password.form";
+import { ForgotPasswordForm } from "@/admin/features/forgot-password/components/forgot-password.form";
 import { Helmet } from "react-helmet-async";
 
 function ForgotPassword() {

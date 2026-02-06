@@ -1,4 +1,4 @@
-import { SignInForm } from "@/features/sign-in/components/sign-in.form";
+import { SignInForm } from "@/admin/features/sign-in/components/sign-in.form";
 import { Helmet } from "react-helmet-async";
 
 function SignIn() {
