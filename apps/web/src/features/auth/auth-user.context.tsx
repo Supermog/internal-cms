@@ -12,7 +12,7 @@ type AuthUserContextType = {
 };
 
 const AuthUserContext = createContext<AuthUserContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export type AuthUserProviderProps = {
