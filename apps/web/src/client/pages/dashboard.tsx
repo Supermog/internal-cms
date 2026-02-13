@@ -1,19 +1,17 @@
 import { PageHeader } from "@/components/page-header";
 import { PageTitle } from "@/components/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthUser } from "@/admin/features/auth/auth-user.context";
+import { useClientUser } from "@/features/auth/client-user.context";
 import { useGetClient } from "@/admin/features/clients/api/get-client";
 import { ClientContactSection } from "@/admin/features/clients/components/client-contact-section";
 import { ClientSupportDetailsSection } from "@/admin/features/clients/components/client-support-details-section";
 import { ClientSupportFeaturesSection } from "@/admin/features/clients/components/client-support-features-section";
-import type { ClientUser } from "@internal-cms/shared";
 
 function ClientDashboard() {
-  const { databaseUser } = useAuthUser();
-  const clientId =
-    databaseUser && "client_uid" in databaseUser
-      ? (databaseUser as ClientUser).client_uid
-      : null;
+  const { databaseUser } = useClientUser();
+
+  const clientId = databaseUser.client_uid;
+
   const { data: client, isLoading, isError } = useGetClient(clientId ?? "");
 
   if (!clientId) {

@@ -1,18 +1,14 @@
 import { PageHeader } from "@/components/page-header";
 import { PageTitle } from "@/components/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthUser } from "@/admin/features/auth/auth-user.context";
+import { useClientUser } from "@/features/auth/client-user.context";
 import { useGetClient } from "@/admin/features/clients/api/get-client";
 import { ClientSupportMonthsSection } from "@/admin/features/clients/support_hours/components/client-support-months-section";
-import type { ClientUser } from "@internal-cms/shared";
 
 function ClientSupportHoursPage() {
-  const { databaseUser } = useAuthUser();
+  const { databaseUser } = useClientUser();
 
-  const clientId =
-    databaseUser && "client_uid" in databaseUser
-      ? (databaseUser as ClientUser).client_uid
-      : null;
+  const clientId = databaseUser.client_uid;
 
   const { data: client, isLoading, isError } = useGetClient(clientId ?? "");
 

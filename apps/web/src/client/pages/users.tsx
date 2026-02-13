@@ -1,18 +1,14 @@
 import { PageHeader } from "@/components/page-header";
 import { PageTitle } from "@/components/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthUser } from "@/admin/features/auth/auth-user.context";
 import { useGetClient } from "@/admin/features/clients/api/get-client";
 import { ClientUsersSection } from "@/admin/features/clients/users/components/client-users-section";
-import type { ClientUser } from "@internal-cms/shared";
+import { useClientUser } from "@/features/auth/client-user.context";
 
 function ClientUsersPage() {
-  const { databaseUser } = useAuthUser();
+  const { databaseUser } = useClientUser();
 
-  const clientId =
-    databaseUser && "client_uid" in databaseUser
-      ? (databaseUser as ClientUser).client_uid
-      : null;
+  const clientId = databaseUser.client_uid;
 
   const { data: client, isLoading, isError } = useGetClient(clientId ?? "");
 

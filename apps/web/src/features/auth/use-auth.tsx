@@ -40,7 +40,7 @@ function useAuth() {
 
         if (session?.user?.id) {
           const { database_user } = await authService.fetchDatabaseUser(
-            session.user.id
+            session.user.id,
           );
           setDatabaseUser(database_user);
           setStatus(database_user ? QueryStatus.Success : QueryStatus.Error);
@@ -49,7 +49,7 @@ function useAuth() {
           setDatabaseUser(null);
           setStatus(QueryStatus.Success);
         }
-      }
+      },
     );
 
     return () => {

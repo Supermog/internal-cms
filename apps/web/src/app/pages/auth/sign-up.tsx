@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { SignUpForm } from "@/admin/features/sign-up/components/sign-up.form";
+import { SignUpForm } from "@/features/sign-up/components/sign-up.form";
 
 function SignUp() {
   return (

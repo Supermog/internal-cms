@@ -1,16 +1,12 @@
 import { PageHeader } from "@/components/page-header";
 import { PageTitle } from "@/components/page-title";
-import { useAuthUser } from "@/admin/features/auth/auth-user.context";
+import { useClientUser } from "@/features/auth/client-user.context";
 import { ClientTicketsSection } from "@/admin/features/tickets/components/client-tickets-section";
-import type { ClientUser } from "@internal-cms/shared";
 
 function ClientTicketsPage() {
-  const { databaseUser } = useAuthUser();
+  const { databaseUser } = useClientUser();
 
-  const clientId =
-    databaseUser && "client_uid" in databaseUser
-      ? (databaseUser as ClientUser).client_uid
-      : null;
+  const clientId = databaseUser.client_uid;
 
   if (!clientId) {
     return (

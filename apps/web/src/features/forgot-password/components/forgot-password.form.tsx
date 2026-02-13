@@ -20,7 +20,7 @@ import {
   ForgotPasswordFormData,
   forgotPasswordSchema,
 } from "../types/forgot-password.schema";
-import { authService } from "@/admin/features/auth/auth.service";
+import { authService } from "@/features/auth/auth.service";
 import { commonRoutePaths } from "@/app/config/route-paths.config";
 
 export function ForgotPasswordForm() {
